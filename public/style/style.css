@@ -1,0 +1,36 @@
+* {
+  -webkit-font-smoothing: antialiased;
+  box-sizing: border-box; }
+
+#container {
+  font-family: "Roboto", "Helvetica Neue", Helvetica, sans-serif;
+  color: #333;
+  width: 800px;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: #efefef;
+  border-radius: 5px; }
+
+h1 {
+  text-align: center;
+  letter-spacing: -0.5px;
+  font-size: 28px; }
+
+hr {
+  border: none;
+  border-bottom: 1px solid #bbb; }
+
+#game {
+  -webkit-user-select: none;
+  box-sizing: content-box;
+  width: 360px;
+  margin: 20px auto;
+  min-height: 360px;
+  border: 1px solid #aaa; }
+
+.square {
+  -webkit-user-select: none;
+  border: 1px solid #aaa;
+  float: left;
+  text-align: center;
+  color: #555; }
