@@ -6,7 +6,8 @@ var TicTacToe = (function() {
 
     var defaults = {
         'grid': 3,
-        'el': '#game'
+        'el': '#game',
+        'streak': 3
     };
 
     function TicTacToe(opts) {
@@ -24,10 +25,14 @@ var TicTacToe = (function() {
             this.board = _createBoard(this.grid);
             this.squares = _createSquares(this.board);
 
-            this.$el.empty().append(_.pluck(_.values(this.squares), '$el'));
+            var els = _.pluck(_.values(this.squares), '$el');
+            var $squares = $('<div>').addClass('squares').append(els);
+            var $checkWin = $('<div>').addClass('check-win').text('Check for a win!');
+            var $notification = $('<div>').addClass('notification');
+            this.$el.append($squares, $checkWin, $notification);
 
             // styling
-            var w = this.$el.width();
+            var w = $squares.width();
             var squareDimensions = w / this.grid;
             this.$('.square').css({
                 'height': squareDimensions + 'px',
@@ -43,12 +48,44 @@ var TicTacToe = (function() {
 
         bindEvents: function() {
             this.$el.on('click', '.square', this.onClickSquare.bind(this));
+            this.$el.on('click', '.check-win', this.onCheckWin.bind(this));
+            this.$el.on('click', '.notification.show', this.onClickNotification.bind(this));
         },
 
         onClickSquare: function(e) {
             var $target = $(e.currentTarget);
             var uid = $target.data('uid');
             this.squares[uid].onClick(e);
+            this.updateBoard();
+        },
+
+        onCheckWin: function() {
+            if (this.checkForWin()) {
+                this.showNotification('Someone won!');
+            }
+        },
+
+        onClickNotification: function(e) {
+            $(e.currentTarget).removeClass('show');
+        },
+
+        showNotification: function(msg) {
+            var $notification = this.$('.notification');
+            if (msg) $notification.text(msg);
+            $notification.addClass('show');
+        },
+
+        updateBoard: function() {
+            _.each(this.squares, function(square) {
+                this.board[square.y][square.x] = square.value;
+            }.bind(this));
+        },
+
+        checkForWin: function() {
+            var results = _.map(this.squares, function(square) {
+                return _checkForWin(this.board, square.x, square.y);
+            }.bind(this));
+            return _.any(results);
         },
 
         $: function(selector) {
@@ -91,6 +128,28 @@ var TicTacToe = (function() {
             }
         }
         return squares;
+    }
+
+    function _checkForWin(board, x, y) {
+        var val = board[y][x];
+        if (!val) return false;
+
+        var horizontalWin = val === board[y][x + 1] &&
+            val === board[y][x + 2];
+
+        var verticalWin = board[y + 1] && board[y + 2] &&
+            val === board[y + 1][x] &&
+            val === board[y + 2][x];
+
+        var diagonal1Win = board[y + 1] && board[y + 2] &&
+            val === board[y + 1][x + 1] &&
+            val === board[y + 2][x + 2];
+
+        var diagonal2Win = board[y + 1] && board[y + 2] && x - 2 >= 0 &&
+            val === board[y + 1][x - 1] &&
+            val === board[y + 2][x - 2];
+
+        return horizontalWin || verticalWin || diagonal1Win || diagonal2Win;
     }
 
     return TicTacToe;

@@ -21,6 +21,9 @@ hr {
   border-bottom: 1px solid #bbb; }
 
 #game {
+  position: relative; }
+
+.squares {
   -webkit-user-select: none;
   box-sizing: content-box;
   width: 360px;
@@ -34,3 +37,36 @@ hr {
   float: left;
   text-align: center;
   color: #555; }
+
+.check-win {
+  display: inline-block;
+  padding: 10px;
+  border-radius: 2px;
+  background-color: #bbb;
+  color: white;
+  cursor: pointer;
+  transition: all 150ms linear; }
+  .check-win:hover {
+    background-color: #999; }
+
+.notification {
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+  top: 100px;
+  left: 50%;
+  width: 600px;
+  margin-left: -300px;
+  background-color: #fff;
+  border-radius: 3px;
+  border: 1px solid #eee;
+  padding: 20px;
+  text-align: center;
+  font-size: 22px;
+  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1);
+  transition: all 250ms ease;
+  -webkit-transform: translateY(0); }
+  .notification.show {
+    opacity: 1;
+    pointer-events: auto;
+    -webkit-transform: translateY(20px); }
