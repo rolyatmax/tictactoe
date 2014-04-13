@@ -14,12 +14,19 @@
 	<script src="bower_components/jquery/dist/jquery.min.js"></script>
 	<script src="bower_components/lodash/dist/lodash.min.js"></script>
 	<script src="bower_components/backbone/backbone.js"></script>
+    <script src="js/Player.js"></script>
 	<script src="js/Square.js"></script>
 	<script src="js/TicTacToe.js"></script>
 	<script>
 		$(function() {
-			window.game = new TicTacToe();
-			window.game.start();
+			window.game = new TicTacToe({
+                    'grid': 5,
+                    'streak': 5,
+                'players': [
+                    new Player({ 'isComputer': true }),
+                    new Player({ 'isComputer': true })
+                ]
+            });
 		});
 	</script>
 </body>

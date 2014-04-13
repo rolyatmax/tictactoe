@@ -36,18 +36,8 @@ hr {
   border: 1px solid #aaa;
   float: left;
   text-align: center;
-  color: #555; }
-
-.check-win {
-  display: inline-block;
-  padding: 10px;
-  border-radius: 2px;
-  background-color: #bbb;
-  color: white;
-  cursor: pointer;
-  transition: all 150ms linear; }
-  .check-win:hover {
-    background-color: #999; }
+  color: #555;
+  text-transform: uppercase; }
 
 .notification {
   opacity: 0;
@@ -65,7 +55,8 @@ hr {
   font-size: 22px;
   box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1);
   transition: all 250ms ease;
-  -webkit-transform: translateY(0); }
+  -webkit-transform: translateY(0);
+  text-transform: uppercase; }
   .notification.show {
     opacity: 1;
     pointer-events: auto;

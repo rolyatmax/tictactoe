@@ -44,19 +44,7 @@ hr {
 	float: left;
 	text-align: center;
 	color: #555;
-}
-
-.check-win {
-    display: inline-block;
-    padding: 10px;
-    border-radius: 2px;
-    background-color: #bbb;
-    color: white;
-    cursor: pointer;
-    transition: all 150ms linear;
-    &:hover {
-        background-color: #999;
-    }
+    text-transform: uppercase;
 }
 
 .notification {
@@ -76,6 +64,7 @@ hr {
     box-shadow: 0 2px 3px rgba(0,0,0,0.1);
     transition: all 250ms ease;
     -webkit-transform: translateY(0);
+    text-transform: uppercase;
     &.show {
         opacity: 1;
         pointer-events: auto;

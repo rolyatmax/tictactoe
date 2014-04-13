@@ -1,9 +1,6 @@
 var Square = (function() {
     'use strict';
 
-    var X = 'x';
-    var O = 'o';
-
     var defaults = {
         'value': null
     };
@@ -17,17 +14,10 @@ var Square = (function() {
 
     _.extend(Square.prototype, Backbone.Events, {
 
-        onClick: function() {
-            var newValue = this.value === X ? O :
-                           this.value === O ? null : X;
-
-            this.setValue(newValue);
-        },
-
         setValue: function(value) {
             this.value = value;
             value = value || '';
-            this.$el.text(value.toUpperCase());
+            this.$el.text(value);
         }
 
     });
