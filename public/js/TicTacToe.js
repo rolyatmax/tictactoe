@@ -75,8 +75,10 @@ var TicTacToe = (function() {
             this.playing = true;
             this.bindEvents();
             _.each(this.players, function(player) {
-                player.start();
-            });
+                player.start({
+                    'game': this
+                });
+            }.bind(this));
             this.nextTurn();
         },
 

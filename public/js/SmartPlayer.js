@@ -15,8 +15,9 @@ var SmartPlayer = (function() {
 
     _.extend(SmartPlayer.prototype, Backbone.Events, {
 
-        start: function() {
+        start: function(opts) {
             Player.prototype.start.apply(this, arguments);
+            this.Q.start(this.game);
         },
 
         onYouLose: function() {

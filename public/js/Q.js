@@ -6,12 +6,12 @@ var Q = (function() {
 
     var defaults = {
         'saveInterval': 5000,
-        'discover': 0.1,
-        'alpha': 0.5,
+        'discover': 0.05,
+        'alpha': 0.3,
         'rewards': {
             'alive': 1,
-            'win': 50,
-            'lose': -50,
+            'win': 500,
+            'lose': -500,
             'cat': 0
         }
     };
@@ -19,22 +19,27 @@ var Q = (function() {
     function Q(opts) {
         opts = _.defaults(opts || {}, defaults);
         _.extend(this, opts);
-        this.loadMatrix();
         this.bindEvents();
-        this.saveMatrix();
     }
 
     _.extend(Q.prototype, Backbone.Events, {
+        start: function(game) {
+            this.game = game;
+            this.loadMatrix();
+            this.saveMatrix();
+        },
+
         loadMatrix: function() {
-            var q = localStorage.getItem(LOCAL_STORAGE_KEY);
+            var q = localStorage.getItem(_localStorageKey(this.game.grid, this.game.streak));
             this.matrix = q ? JSON.parse(q) : {};
+            if (q) console.log('using stored Q:', _localStorageKey(this.game.grid, this.game.streak));
         },
 
         saveMatrix: function() {
             if (this.saveInterval) {
                 setTimeout(this.saveMatrix.bind(this), this.saveInterval);
             }
-            localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(this.matrix));
+            localStorage.setItem(_localStorageKey(this.game.grid, this.game.streak), JSON.stringify(this.matrix));
             console.log('saved to localStorage');
         },
 
@@ -98,7 +103,9 @@ var Q = (function() {
     });
 
     /////////// helpers
-
+    function _localStorageKey(grid, streak) {
+        return LOCAL_STORAGE_KEY + '_' + grid + '_' + streak;
+    }
 
 
     return Q;

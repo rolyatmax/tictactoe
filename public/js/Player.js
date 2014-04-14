@@ -4,7 +4,7 @@ var Player = (function() {
     var defaults = {
         'symbol': null,
         'isComputer': false,
-        'delay': 1,
+        'delay': 0,
         'wins': 0
     };
 
@@ -16,7 +16,8 @@ var Player = (function() {
 
     _.extend(Player.prototype, Backbone.Events, {
 
-        start: function() {
+        start: function(opts) {
+            this.game = opts['game'];
             this.bindEvents();
             this.trigger('request_symbol');
             this.createScorecard();
