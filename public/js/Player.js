@@ -4,7 +4,7 @@ var Player = (function() {
     var defaults = {
         'symbol': null,
         'isComputer': false,
-        'delay': 100,
+        'delay': 1,
         'wins': 0
     };
 
@@ -33,7 +33,8 @@ var Player = (function() {
 
             this.listenTo(this, 'your_turn', this.onTurn);
             this.listenTo(this, 'take_symbol', this.setSymbol);
-            this.listenTo(this, 'game_over', this.onGameOver);
+            this.listenTo(this, 'you_lose', this.onYouLose);
+            this.listenTo(this, 'cat', this.onCat);
             this.listenTo(this, 'you_won', this.onYouWon);
 
             this._eventsBound = true;
@@ -43,7 +44,11 @@ var Player = (function() {
             this.symbol = symbol;
         },
 
-        onGameOver: function() {
+        onCat: function() {
+            this.trigger('new_game');
+        },
+
+        onYouLose: function() {
             this.trigger('new_game');
         },
 
@@ -63,7 +68,6 @@ var Player = (function() {
         },
 
         play: function(board) {
-            console.log('My Turn! player:', this.id);
             if (!this.isComputer) return;
 
             var options = _getOptions(board);

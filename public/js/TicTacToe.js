@@ -16,7 +16,6 @@ var TicTacToe = (function() {
         _.extend(this, opts);
         this.$el = $(opts['el']);
         this.setup();
-
     }
 
     _.extend(TicTacToe.prototype, Backbone.Events, {
@@ -33,9 +32,10 @@ var TicTacToe = (function() {
                 square.setValue(null);
             });
             this.board = _createBoard(this.grid);
-            this.currentPlayer = this.players[0];
+            var i = _.random(0, this.players.length - 1);
+            this.currentPlayer = this.players[i];
             this.nextTurn();
-        }, 200),
+        }, 5, {leading: true}),
 
         setupBoard: function() {
             if (!this.$el) throw 'Cannot setup board! No DOM Element for game found';
@@ -107,7 +107,7 @@ var TicTacToe = (function() {
             if (winner) {
                 this.showNotification(winner.id + ' won!');
                 _.each(this.players, function(player) {
-                    var ev = player === winner ? 'you_won' : 'game_over';
+                    var ev = player === winner ? 'you_won' : 'you_lose';
                     player.trigger(ev);
                 }.bind(this));
                 return;
@@ -116,7 +116,7 @@ var TicTacToe = (function() {
             if (this.checkForCat()) {
                 this.showNotification('CAT!');
                 _.each(this.players, function(player) {
-                    player.trigger('game_over');
+                    player.trigger('cat');
                 }.bind(this));
                 return;
             }
