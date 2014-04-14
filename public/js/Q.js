@@ -53,27 +53,23 @@ var Q = (function() {
             this.symbol = symbol;
         },
 
-        hashBoard: function(board) {
-            if (!this.symbol) throw 'Hashing requires a symbol to be set first';
-
-            // creating hashes of the board, to store as keys for the state info for Q
-            // 0 = null, a = me, b = opponent
-            return 'h_' + _.map(_.flatten(board), function(symbol) {
-                if (!symbol) return 0;
-                if (symbol === this.symbol) return 'a';
-                return 'b';
-            }.bind(this)).join('');
+        getState: function(board) {
+            this.mutations = _permutationSearch(board, this.matrix, this.symbol);
+            var hash = this.mutations ? this.mutations['hash'] : _hashBoard(board, this.symbol);
+            return this.matrix[hash] || (this.matrix[hash] = {});
         },
 
         choose: function(board, options) {
-            var hash = this.hashBoard(board);
-            var state = this.matrix[hash] || (this.matrix[hash] = {});
+            var state = this.getState(board);
 
             _.each(options, function(option) {
-                var actionHash = option.x + DELIMITER + option.y;
+                var mutated = _mutate(option, this.mutations);
+                option['x'] = mutated['x'];
+                option['y'] = mutated['y'];
+                var actionHash = option['x'] + DELIMITER + option['y'];
                 option['hash'] = actionHash;
                 option['points'] = state[actionHash] || (state[actionHash] = 0);
-            });
+            }.bind(this));
 
             var min = _.min(options, function(option) { return option['points']; });
             var max = _.max(options, function(option) { return option['points']; });
@@ -84,9 +80,10 @@ var Q = (function() {
             this.curPts = action['points'];
             this.trigger('reward_activity', 'alive');
 
+            var hash = this.mutations ? this.mutations['hash'] : _hashBoard(board, this.symbol);
             this.lastBoard = hash;
             this.lastAction = action['hash'];
-            return action;
+            return _mutate(action, this.mutations, true);
         },
 
         evaluateLast: function(result) {
@@ -107,6 +104,86 @@ var Q = (function() {
         return LOCAL_STORAGE_KEY + '_' + grid + '_' + streak;
     }
 
+    function _hashBoard(board, mySymbol) {
+        // creating hashes of the board, to store as keys for the state info for Q
+        // 0 = null, a = me, b = opponent
+        return 'h_' + _.map(_.flatten(board), function(symbol) {
+            if (!symbol) return 0;
+            if (symbol === mySymbol) return 'a';
+            return 'b';
+        }).join('');
+    }
+
+    function _permutationSearch(board, matrix, mySymbol) {
+        var mutations = {
+            turns: 0,
+            flips: 0,
+            hash: null,
+            boardSize: board.length
+        };
+        var flips = 1;
+        while (flips--) {
+            mutations['flips'] = flips;
+            board = _flip(board, flips);
+            var turns = 3;
+            while (turns--) {
+                mutations['turns'] = turns;
+                var hash = _hashBoard(_rotate(board, turns), mySymbol);
+                mutations['hash'] = hash;
+                if (hash in matrix) return mutations;
+            }
+        }
+        return false;
+    }
+
+    function _rotate(board, turns) {
+        turns = turns || 1;
+        board = _.cloneDeep(board);
+        var newBoard;
+        var lastX = board[0].length - 1;
+        while (turns--) {
+            newBoard = [];
+            var y = board.length;
+            while (y--) {
+                var x = board[y].length;
+                while (x--) {
+                    newBoard[x] = newBoard[x] || [];
+                    newBoard[x][lastX - y] = board[y][x];
+                }
+            }
+            board = newBoard;
+        }
+        return board;
+    }
+
+    function _flip(board, flips) {
+        if (flips === 0) return board;
+        board = _.cloneDeep(board);
+        var y = board.length;
+        while (y--) {
+            board[y] = board[y].reverse();
+        }
+        return board;
+    }
+
+    function _mutate(action, mutations, reverse) {
+        action = _.clone(action);
+        var newAction = _.clone(action);
+        var lastX = mutations['boardSize'] - 1;
+        var turns = reverse ? 4 - mutations['turns'] : mutations['turns'];
+        var flips = mutations['flips'];
+
+        while (turns--) {
+            newAction['x'] = lastX - action['y'];
+            newAction['y'] = action['x'];
+            action = _.extend(action, newAction);
+        }
+
+        if (flips) {
+            newAction['x'] = Math.abs(action['x'] - lastX);
+        }
+        return newAction;
+    }
 
     return Q;
 })();

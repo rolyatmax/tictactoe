@@ -35,7 +35,7 @@ var TicTacToe = (function() {
             var i = _.random(0, this.players.length - 1);
             this.currentPlayer = this.players[i];
             this.nextTurn();
-        }, 5, {leading: true}),
+        }, 10), //, {leading: true}),
 
         setupBoard: function() {
             if (!this.$el) throw 'Cannot setup board! No DOM Element for game found';
@@ -149,9 +149,9 @@ var TicTacToe = (function() {
         },
 
         selectSquare: function(player, x, y) {
-            if (player !== this.currentPlayer) return;
+            if (player !== this.currentPlayer); // throw 'Not current player';
             var square = this.getSquareByCoords(x, y);
-            if (square.value) return;
+            if (square.value) throw 'Square already taken';
             square.setValue(this.currentPlayer.symbol);
             this.updateBoard();
             this.nextTurn();
