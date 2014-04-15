@@ -6,7 +6,7 @@ var Q = (function() {
 
     var defaults = {
         'saveInterval': 5000,
-        'discover': 0.01,
+        'discover': 0.0,
         'alpha': 0.3,
         'rewards': {
             'alive': 1,
@@ -27,6 +27,14 @@ var Q = (function() {
             this.game = game;
             this.loadMatrix();
             this.saveMatrix();
+        },
+
+        set: function(attrs) {
+            attrs = _.pick(attrs, _.keys(defaults));
+            _.extend(this, attrs);
+            _.each(attrs, function(val, attr) {
+                this.trigger('change:' + attr);
+            }.bind(this));
         },
 
         loadMatrix: function() {

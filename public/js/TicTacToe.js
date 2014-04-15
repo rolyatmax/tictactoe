@@ -226,7 +226,7 @@ var TicTacToe = (function() {
                 this.stopPlay();
             } else {
                 this.playing = true;
-                this.reset();
+                this.nextTurn();
             }
         },
 

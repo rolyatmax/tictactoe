@@ -6,7 +6,7 @@ var SmartPlayer = (function() {
     function SmartPlayer(opts) {
         new Player(opts);
         this.id = _.uniqueId('smart');
-        this.Q = new Q();
+        this.Q = new Q(opts);
     }
 
     SmartPlayer.prototype = new Player({
