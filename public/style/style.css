@@ -39,6 +39,19 @@ hr {
   color: #555;
   text-transform: uppercase; }
 
+.clear {
+  text-align: center;
+  width: 160px;
+  padding: 20px;
+  border-radius: 3px;
+  background-color: #ccc;
+  margin: auto;
+  color: white;
+  cursor: pointer;
+  transition: all 200ms linear; }
+  .clear:hover {
+    background-color: #aaa; }
+
 .notification {
   opacity: 0;
   pointer-events: none;

@@ -30,6 +30,15 @@ var SmartPlayer = (function() {
             Player.prototype.onCat.apply(this, arguments);
         },
 
+        bindEvents: function() {
+            Player.prototype.bindEvents.apply(this, arguments);
+            this.listenTo(this, 'clear_q', this.clearQ);
+        },
+
+        clearQ: function() {
+            this.Q.trigger('clear');
+        },
+
         setSymbol: function(symbol) {
             Player.prototype.setSymbol.apply(this, arguments);
             this.Q.setSymbol(symbol);

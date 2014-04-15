@@ -6,12 +6,12 @@ var Q = (function() {
 
     var defaults = {
         'saveInterval': 5000,
-        'discover': 0.05,
+        'discover': 0.01,
         'alpha': 0.3,
         'rewards': {
             'alive': 1,
             'win': 500,
-            'lose': -500,
+            'lose': -1000,
             'cat': 0
         }
     };
@@ -46,7 +46,14 @@ var Q = (function() {
         bindEvents: function() {
             if (this._eventsBound) return;
             this.listenTo(this, 'reward_activity', this.evaluateLast);
+            this.listenTo(this, 'clear', this.clear);
             this._eventsBound = true;
+        },
+
+        clear: function() {
+            this.matrix = {};
+            localStorage.setItem(_localStorageKey(this.game.grid, this.game.streak), '');
+            this.lastAction = null;
         },
 
         setSymbol: function(symbol) {
@@ -74,7 +81,7 @@ var Q = (function() {
             var min = _.min(options, function(option) { return option['points']; });
             var max = _.max(options, function(option) { return option['points']; });
 
-            var chooseRandom = (min['points'] === max['points'] || Math.random < this.discover);
+            var chooseRandom = (min['points'] === max['points'] || Math.random() < this.discover);
             var action = chooseRandom ? options[_.random(0, options.length - 1)] : max;
 
             this.curPts = action['points'];
@@ -94,7 +101,7 @@ var Q = (function() {
             var lastStateActionVal = lastState[this.lastAction];
             var curPts = this.curPts || 0;
             var points = lastStateActionVal + this.alpha * (reward + curPts - lastStateActionVal);
-            lastState[this.lastAction] = points;
+            lastState[this.lastAction] = ((points * 1000) | 0) / 1000;
         }
 
     });

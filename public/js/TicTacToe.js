@@ -26,7 +26,8 @@ var TicTacToe = (function() {
             this.start();
         },
 
-        reset: _.debounce(function() {
+        reset: function() {
+            if (this.playing) return;
             this.hideNotification();
             _.each(this.squares, function(square) {
                 square.setValue(null);
@@ -34,8 +35,9 @@ var TicTacToe = (function() {
             this.board = _createBoard(this.grid);
             var i = _.random(0, this.players.length - 1);
             this.currentPlayer = this.players[i];
+            this.playing = true;
             this.nextTurn();
-        }, 10), //, {leading: true}),
+        },
 
         setupBoard: function() {
             if (!this.$el) throw 'Cannot setup board! No DOM Element for game found';
@@ -45,10 +47,11 @@ var TicTacToe = (function() {
 
             var els = _.pluck(_.values(this.squares), '$el');
             var $squares = $('<div>').addClass('squares').append(els);
+            var $clear = $('<div>').addClass('clear').text('Clear matrix');
             var $notification = $('<div>').addClass('notification');
             var $scores = $('<div>').addClass('scores');
             this.$el.empty();
-            this.$el.append($squares, $notification, $scores);
+            this.$el.append($squares, $notification, $scores, $clear);
 
             // styling
             var w = $squares.width();
@@ -89,6 +92,7 @@ var TicTacToe = (function() {
 
             this.$el.on('click', '.square', this.onClickSquare.bind(this));
             this.$el.on('click', '.notification.show', this.reset.bind(this));
+            this.$el.on('click', '.clear', this.clearQ.bind(this));
             
             _.each(this.players, function(player) {
                 var selectHandler = _.partial(this.selectSquare, player);
@@ -107,6 +111,7 @@ var TicTacToe = (function() {
 
             var winner = this.checkForWin();
             if (winner) {
+                this.playing = false;
                 this.showNotification(winner.id + ' won!');
                 _.each(this.players, function(player) {
                     var ev = player === winner ? 'you_won' : 'you_lose';
@@ -116,6 +121,7 @@ var TicTacToe = (function() {
             }
 
             if (this.checkForCat()) {
+                this.playing = false;
                 this.showNotification('CAT!');
                 _.each(this.players, function(player) {
                     player.trigger('cat');
@@ -146,6 +152,14 @@ var TicTacToe = (function() {
 
         onInsertScoreCard: function($el) {
             this.$('.scores').append($el);
+        },
+
+        clearQ: function() {
+            _.each(this.players, function(player) {
+                if (player['isComputer']) {
+                    player.trigger('clear_q');
+                }
+            }.bind(this));
         },
 
         selectSquare: function(player, x, y) {
