@@ -152,7 +152,20 @@ var TicTacToe = (function() {
             var $target = $(e.currentTarget);
             var uid = $target.data('uid');
             var coords = uid.split(DELIMITER);
-            this.selectSquare(this.currentPlayer, coords[0], coords[1]);
+
+            // select the first available square in that column
+            var x = coords[0];
+            var y;
+            var rows = this.board.length;
+            while (rows--) {
+                if (!this.board[rows][x]) {
+                    y = rows;
+                    break;
+                }
+            }
+            if (!y) return console.warn('No available square found in this column');
+
+            this.selectSquare(this.currentPlayer, x, y);
         },
 
         onKeyPress: function(e) {

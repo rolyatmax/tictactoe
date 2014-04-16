@@ -92,15 +92,16 @@ var Player = (function() {
     /////////// helpers
     function _getOptions(board) {
         var options = [];
-        var y = board.length;
-        while (y--) {
-            var x = board[y].length;
-            while (x--) {
+        var x = board[0].length;
+        while (x--) {
+            var y = board.length;
+            while (y--) {
                 if (!board[y][x]) {
                     options.push({
                         'x': x,
                         'y': y
                     });
+                    break;
                 }
             }
         }

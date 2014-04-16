@@ -22,9 +22,10 @@
 	<script src="js/TicTacToe.js"></script>
 	<script>
 		$(function() {
-            window.game = new TicTacToe({
-                    'grid': 3,
-                    'streak': 3,
+
+			window.game = new TicTacToe({
+                    'grid': 8,
+                    'streak': 4,
                 'players': [
                     new SmartPlayer(),
                     new Player({

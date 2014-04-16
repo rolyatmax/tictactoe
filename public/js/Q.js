@@ -211,13 +211,9 @@ var Q = (function() {
         while (flips--) {
             mutations['flips'] = flips;
             board = _flip(board, flips);
-            var turns = 3;
-            while (turns--) {
-                mutations['turns'] = turns;
-                var hash = _hashBoard(_rotate(board, turns), mySymbol);
-                mutations['hash'] = hash;
-                if (hash in matrix) return mutations;
-            }
+            var hash = _hashBoard(board, mySymbol);
+            mutations['hash'] = hash;
+            if (hash in matrix) return mutations;
         }
         return false;
     }
