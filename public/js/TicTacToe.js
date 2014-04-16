@@ -247,10 +247,16 @@ var TicTacToe = (function() {
 
         togglePlay: function() {
             if (this.playing) {
+                _.each(this.players, function(player) {
+                    player.trigger('pause');
+                });
                 this.stopPlay();
             } else {
                 this.playing = true;
                 this.nextTurn();
+                _.each(this.players, function(player) {
+                    player.trigger('restart');
+                });
             }
         },
 

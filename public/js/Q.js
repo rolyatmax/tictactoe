@@ -8,12 +8,12 @@ var Q = (function() {
         'useLocalStorage': false,
         'saveInterval': 5000,
         'discover': 0.0,
-        'alpha': 0.3,
+        'alpha': 0.9,
         'rewards': {
-            'alive': 10,
-            'win': 500,
+            'alive': 0,
+            'win': 1000,
             'lose': -1000,
-            'cat': 10
+            'cat': 0
         }
     };
 
@@ -91,10 +91,15 @@ var Q = (function() {
                 return;
             }
             if (this.saveInterval) {
-                setTimeout(this.saveMatrix.bind(this), this.saveInterval);
+                if (this.timeout) clearTimeout(this.timeout);
+                this.timeout = setTimeout(this.saveMatrix.bind(this), this.saveInterval);
             }
             localStorage.setItem(this.name, JSON.stringify(this.matrix));
             console.log('saved to localStorage');
+        },
+
+        stopTimer: function() {
+            clearTimeout(this.timeout);
         },
 
         bindEvents: function() {
@@ -102,6 +107,8 @@ var Q = (function() {
             this.listenTo(this, 'reward_activity', this.evaluateLast);
             this.listenTo(this, 'clear', this.clear);
             this.listenTo(this, 'set_discover', this.setDiscover);
+            this.listenTo(this, 'pause', this.pause);
+            this.listenTo(this, 'restart', this.saveMatrix);
             this._eventsBound = true;
         },
 
@@ -125,6 +132,10 @@ var Q = (function() {
                 localStorage.setItem(this.name, '');
                 window.location.reload();
             }.bind(this));
+        },
+
+        pause: function() {
+            this.stopTimer();
         },
 
         setSymbol: function(symbol) {

@@ -47,6 +47,14 @@ var SmartPlayer = (function() {
             this.Q.trigger('clear');
         },
 
+        pause: function() {
+            this.Q.trigger('pause');
+        },
+
+        restart: function() {
+            this.Q.trigger('restart');
+        },
+
         setSymbol: function(symbol) {
             Player.prototype.setSymbol.apply(this, arguments);
             this.Q.setSymbol(symbol);

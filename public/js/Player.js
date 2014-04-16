@@ -39,6 +39,8 @@ var Player = (function() {
             this.listenTo(this, 'cat', this.onCat);
             this.listenTo(this, 'you_won', this.onYouWon);
             this.listenTo(this, 'toggle_computer', this.onToggleComputer);
+            this.listenTo(this, 'pause', this.pause);
+            this.listenTo(this, 'restart', this.restart);
 
             this._eventsBound = true;
         },
@@ -46,6 +48,9 @@ var Player = (function() {
         onToggleComputer: function() {
             this.isComputer = !this.isComputer;
         },
+        pause: function() {},
+
+        restart: function() {},
 
         setSymbol: function(symbol) {
             this.symbol = symbol;
