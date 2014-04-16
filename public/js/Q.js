@@ -6,13 +6,13 @@ var Q = (function() {
 
     var defaults = {
         'saveInterval': 5000,
-        'discover': 0.05,
+        'discover': 0.0,
         'alpha': 0.3,
         'rewards': {
-            'alive': 1,
+            'alive': 10,
             'win': 500,
-            'lose': -500,
-            'cat': 0
+            'lose': -1000,
+            'cat': 10
         }
     };
 
@@ -74,7 +74,7 @@ var Q = (function() {
             var min = _.min(options, function(option) { return option['points']; });
             var max = _.max(options, function(option) { return option['points']; });
 
-            var chooseRandom = (min['points'] === max['points'] || Math.random < this.discover);
+            var chooseRandom = (min['points'] === max['points'] || Math.random() < this.discover);
             var action = chooseRandom ? options[_.random(0, options.length - 1)] : max;
 
             this.curPts = action['points'];

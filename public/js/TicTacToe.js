@@ -26,7 +26,9 @@ var TicTacToe = (function() {
             this.start();
         },
 
-        reset: _.debounce(function() {
+        reset: function() {
+            if (this.playing) return;
+            this.playing = true;
             this.hideNotification();
             _.each(this.squares, function(square) {
                 square.setValue(null);
@@ -35,7 +37,7 @@ var TicTacToe = (function() {
             var i = _.random(0, this.players.length - 1);
             this.currentPlayer = this.players[i];
             this.nextTurn();
-        }, 10), //, {leading: true}),
+        },
 
         setupBoard: function() {
             if (!this.$el) throw 'Cannot setup board! No DOM Element for game found';
@@ -89,7 +91,7 @@ var TicTacToe = (function() {
 
             this.$el.on('click', '.square', this.onClickSquare.bind(this));
             this.$el.on('click', '.notification.show', this.reset.bind(this));
-            
+
             _.each(this.players, function(player) {
                 var selectHandler = _.partial(this.selectSquare, player);
                 var requestSymbolHandler = _.partial(this.requestSymbol, player);
@@ -107,6 +109,7 @@ var TicTacToe = (function() {
 
             var winner = this.checkForWin();
             if (winner) {
+                this.playing = false;
                 this.showNotification(winner.id + ' won!');
                 _.each(this.players, function(player) {
                     var ev = player === winner ? 'you_won' : 'you_lose';
@@ -116,6 +119,7 @@ var TicTacToe = (function() {
             }
 
             if (this.checkForCat()) {
+                this.playing = false;
                 this.showNotification('CAT!');
                 _.each(this.players, function(player) {
                     player.trigger('cat');
@@ -211,7 +215,6 @@ var TicTacToe = (function() {
             if (this.playing) {
                 this.stopPlay();
             } else {
-                this.playing = true;
                 this.reset();
             }
         },
