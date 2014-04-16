@@ -6,7 +6,7 @@ var SmartPlayer = (function() {
     function SmartPlayer(opts) {
         new Player(opts);
         this.id = _.uniqueId('smart');
-        this.Q = new Q();
+        this.Q = new Q(opts);
     }
 
     SmartPlayer.prototype = new Player({
@@ -28,6 +28,15 @@ var SmartPlayer = (function() {
         onCat: function() {
             this.Q.trigger('reward_activity', 'cat');
             Player.prototype.onCat.apply(this, arguments);
+        },
+
+        bindEvents: function() {
+            Player.prototype.bindEvents.apply(this, arguments);
+            this.listenTo(this, 'clear_q', this.clearQ);
+        },
+
+        clearQ: function() {
+            this.Q.trigger('clear');
         },
 
         setSymbol: function(symbol) {
