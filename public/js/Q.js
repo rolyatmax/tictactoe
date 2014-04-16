@@ -5,6 +5,7 @@ var Q = (function() {
     var LOCAL_STORAGE_KEY = 'q';
 
     var defaults = {
+        'useLocalStorage': false,
         'saveInterval': 5000,
         'discover': 0.0,
         'alpha': 0.3,
@@ -38,12 +39,19 @@ var Q = (function() {
         },
 
         loadMatrix: function() {
-            var q = localStorage.getItem(_localStorageKey(this.game.grid, this.game.streak));
-            this.matrix = q ? JSON.parse(q) : {};
-            if (q) console.log('using stored Q:', _localStorageKey(this.game.grid, this.game.streak));
+            if (this.useLocalStorage) {
+                var q = localStorage.getItem(_localStorageKey(this.game.grid, this.game.streak));
+                this.matrix = q ? JSON.parse(q) : {};
+                if (q) console.log('using stored Q:', _localStorageKey(this.game.grid, this.game.streak));
+            } else {
+                this.matrix = this.Q || {};
+            }
         },
 
         saveMatrix: function() {
+            if (!this.useLocalStorage) {
+                return;
+            }
             if (this.saveInterval) {
                 setTimeout(this.saveMatrix.bind(this), this.saveInterval);
             }
@@ -109,7 +117,14 @@ var Q = (function() {
             var lastStateActionVal = lastState[this.lastAction];
             var curPts = this.curPts || 0;
             var points = lastStateActionVal + this.alpha * (reward + curPts - lastStateActionVal);
-            lastState[this.lastAction] = ((points * 1000) | 0) / 1000;
+            points = ((points * 1000) | 0) / 1000;
+            lastState[this.lastAction] = points;
+
+            qPersist.save({
+                'stateHash': this.lastBoard,
+                'actionHash': this.lastAction,
+                'val': points
+            });
         }
 
     });

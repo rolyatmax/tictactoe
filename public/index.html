@@ -8,29 +8,33 @@
 </head>
 <body>
 	<div id="container">
-		<h1>Tic Tac Toe Machine Learning</h1>
+		<h1>Connect Four - Machine Learning</h1>
 		<div id="game"></div>
 	</div>
 	<script src="bower_components/jquery/dist/jquery.min.js"></script>
 	<script src="bower_components/lodash/dist/lodash.min.js"></script>
 	<script src="bower_components/backbone/backbone.js"></script>
-    <script src="js/Q.js"></script>    
+
+    <script src="js/q_persist.js"></script>
+    <script src="js/Q.js"></script>
     <script src="js/Player.js"></script>
     <script src="js/SmartPlayer.js"></script>
 	<script src="js/Square.js"></script>
 	<script src="js/TicTacToe.js"></script>
 	<script>
 		$(function() {
-			window.game = new TicTacToe({
-                    'grid': 3,
-                    'streak': 3,
-                'players': [
-                    new SmartPlayer(),
-                    new Player({
-                        'isComputer': true,
-                        // 'discover': 0.3,
-                    })
-                ]
+            qPersist.start(function(res) {
+                window.game = new TicTacToe({
+                        'grid': 3,
+                        'streak': 3,
+                    'players': [
+                        new SmartPlayer({ 'Q': res.Q }),
+                        new Player({
+                            'isComputer': true,
+                            // 'discover': 0.3,
+                        })
+                    ]
+                });
             });
 		});
 	</script>
