@@ -50,8 +50,10 @@ var TicTacToe = (function() {
             var $clear = $('<div>').addClass('clear').text('Clear matrix');
             var $notification = $('<div>').addClass('notification');
             var $scores = $('<div>').addClass('scores');
+            var $toggle = $('<div>').addClass('toggle').text('Toggle Computer');
+            var $discover = $('<input type="text">').addClass('discover');
             this.$el.empty();
-            this.$el.append($squares, $notification, $scores, $clear);
+            this.$el.append($squares, $notification, $scores, $clear, $toggle, $discover);
 
             // styling
             var w = $squares.width();
@@ -93,6 +95,8 @@ var TicTacToe = (function() {
             this.$el.on('click', '.square', this.onClickSquare.bind(this));
             this.$el.on('click', '.notification.show', this.reset.bind(this));
             this.$el.on('click', '.clear', this.clearQ.bind(this));
+            this.$el.on('click', '.toggle', this.toggleComputer.bind(this));
+            this.$el.on('blur', 'input.discover', this.setDiscover.bind(this));
 
             _.each(this.players, function(player) {
                 var selectHandler = _.partial(this.selectSquare, player);
@@ -104,6 +108,13 @@ var TicTacToe = (function() {
             }.bind(this));
 
             this._eventsBound = true;
+        },
+
+        setDiscover: function() {
+            var val = $('input.discover').val();
+            _.each(this.players, function(player) {
+                player.trigger('set_discover', val);
+            });
         },
 
         nextTurn: function() {
@@ -146,7 +157,7 @@ var TicTacToe = (function() {
 
         onKeyPress: function(e) {
             if (e.which === 32) { // spacebar
-                this.togglePlay();
+                this.toggleComputer();
             }
         },
 
@@ -228,6 +239,13 @@ var TicTacToe = (function() {
                 this.playing = true;
                 this.nextTurn();
             }
+        },
+
+        toggleComputer: function() {
+            _.each(this.players, function(player) {
+                player.trigger('toggle_computer');
+            });
+            this.nextTurn();
         },
 
         stopPlay: function() {

@@ -4,8 +4,7 @@ var Player = (function() {
     var defaults = {
         'symbol': null,
         'isComputer': false,
-        'delay': 0,
-        'wins': 0
+        'delay': 0
     };
 
     function Player(opts) {
@@ -18,6 +17,8 @@ var Player = (function() {
 
         start: function(opts) {
             this.game = opts['game'];
+            this.wins = 0;
+            this.total = 0;
             this.bindEvents();
             this.trigger('request_symbol');
             this.createScorecard();
@@ -37,8 +38,13 @@ var Player = (function() {
             this.listenTo(this, 'you_lose', this.onYouLose);
             this.listenTo(this, 'cat', this.onCat);
             this.listenTo(this, 'you_won', this.onYouWon);
+            this.listenTo(this, 'toggle_computer', this.onToggleComputer);
 
             this._eventsBound = true;
+        },
+
+        onToggleComputer: function() {
+            this.isComputer = !this.isComputer;
         },
 
         setSymbol: function(symbol) {
@@ -46,15 +52,18 @@ var Player = (function() {
         },
 
         onCat: function() {
+            this.total += 1;
             this.trigger('new_game');
         },
 
         onYouLose: function() {
+            this.total += 1;
             this.trigger('new_game');
         },
 
         onYouWon: function() {
             this.wins += 1;
+            this.total += 1;
             this.renderScore();
         },
 
@@ -64,7 +73,8 @@ var Player = (function() {
         },
 
         renderScore: function() {
-            var text = this.id + ': ' + this.wins;
+            var perc = ((this.wins / this.total * 100000) | 0) / 1000;
+            var text = this.id + ': ' + this.wins + ' - ' + perc + '%';
             this.$scorecard.text(text);
         },
 

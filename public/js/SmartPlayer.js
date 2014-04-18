@@ -10,7 +10,8 @@ var SmartPlayer = (function() {
     }
 
     SmartPlayer.prototype = new Player({
-        'isComputer': true
+        'isComputer': true,
+        'isSmart': true
     });
 
     _.extend(SmartPlayer.prototype, Backbone.Events, {
@@ -33,7 +34,14 @@ var SmartPlayer = (function() {
         bindEvents: function() {
             Player.prototype.bindEvents.apply(this, arguments);
             this.listenTo(this, 'clear_q', this.clearQ);
+            this.listenTo(this, 'set_discover', this.setDiscover);
         },
+
+        setDiscover: function(discover) {
+            this.Q.trigger('set_discover', discover);
+        },
+
+        onToggleComputer: function() {},
 
         clearQ: function() {
             this.Q.trigger('clear');

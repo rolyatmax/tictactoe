@@ -20,14 +20,27 @@ var Q = (function() {
     function Q(opts) {
         opts = _.defaults(opts || {}, defaults);
         _.extend(this, opts);
+        this.matrix = {};
+        this.stack = [];
+        this.started = false;
         this.bindEvents();
     }
 
     _.extend(Q.prototype, Backbone.Events, {
         start: function(game) {
             this.game = game;
-            this.loadMatrix();
-            this.saveMatrix();
+            $('input.discover').val(this.discover);
+            this.name = _localStorageKey(this.game.grid, this.game.streak);
+            if (this.useLocalStorage) {
+                this.loadMatrix();
+                this.saveMatrix();
+            }
+            this.send();
+            this.started = true;
+        },
+
+        push: function(data) {
+            this.stack.push(data);
         },
 
         set: function(attrs) {
@@ -38,14 +51,39 @@ var Q = (function() {
             }.bind(this));
         },
 
-        loadMatrix: function() {
-            if (this.useLocalStorage) {
-                var q = localStorage.getItem(_localStorageKey(this.game.grid, this.game.streak));
-                this.matrix = q ? JSON.parse(q) : {};
-                if (q) console.log('using stored Q:', _localStorageKey(this.game.grid, this.game.streak));
-            } else {
-                this.matrix = this.Q || {};
+        send: function() {
+            setTimeout(this.send.bind(this), 10000);
+            this.sendData();
+        },
+
+        sendData: function() {
+            if (this.started && !this.stack.length) {
+                return;
             }
+
+            var qs = this.stack.slice();
+            this.stack = [];
+
+            return $.ajax({
+                url: '/q',
+                data: JSON.stringify({qs: qs}),
+                contentType: 'application/json; charset=utf-8',
+                dataType: 'json',
+                type: 'POST'
+            }).then(function(res) {
+                this.matrix = res.q[this.name] || {};
+                console.log('Q received!', res);
+            }.bind(this));
+        },
+
+        loadMatrix: function() {
+            if (!this.useLocalStorage) {
+                return;
+            }
+
+            var q = localStorage.getItem(this.name);
+            this.matrix = q ? JSON.parse(q) : {};
+            if (q) console.log('using stored Q:', this.name);
         },
 
         saveMatrix: function() {
@@ -55,7 +93,7 @@ var Q = (function() {
             if (this.saveInterval) {
                 setTimeout(this.saveMatrix.bind(this), this.saveInterval);
             }
-            localStorage.setItem(_localStorageKey(this.game.grid, this.game.streak), JSON.stringify(this.matrix));
+            localStorage.setItem(this.name, JSON.stringify(this.matrix));
             console.log('saved to localStorage');
         },
 
@@ -63,13 +101,30 @@ var Q = (function() {
             if (this._eventsBound) return;
             this.listenTo(this, 'reward_activity', this.evaluateLast);
             this.listenTo(this, 'clear', this.clear);
+            this.listenTo(this, 'set_discover', this.setDiscover);
             this._eventsBound = true;
         },
 
+        setDiscover: function(discover) {
+            this.discover = parseFloat(discover, 10);
+            console.log('Discover set to:', this.discover);
+        },
+
         clear: function() {
-            this.matrix = {};
-            localStorage.setItem(_localStorageKey(this.game.grid, this.game.streak), '');
-            this.lastAction = null;
+            var qs = {
+                'reset': true
+            };
+
+            return $.ajax({
+                url: '/q',
+                data: JSON.stringify({qs: qs}),
+                contentType: 'application/json; charset=utf-8',
+                dataType: 'json',
+                type: 'POST'
+            }).done(function(res) {
+                localStorage.setItem(this.name, '');
+                window.location.reload();
+            }.bind(this));
         },
 
         setSymbol: function(symbol) {
@@ -120,7 +175,8 @@ var Q = (function() {
             points = ((points * 1000) | 0) / 1000;
             lastState[this.lastAction] = points;
 
-            qPersist.save({
+            this.push({
+                'name': this.name,
                 'stateHash': this.lastBoard,
                 'actionHash': this.lastAction,
                 'val': points
