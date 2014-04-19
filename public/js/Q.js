@@ -10,7 +10,7 @@ var Q = (function() {
         'discover': 0.0,
         'alpha': 0.9,
         'rewards': {
-            'alive': 0,
+            'alive': 10,
             'win': 1000,
             'lose': -1000,
             'cat': 0
@@ -180,7 +180,8 @@ var Q = (function() {
 
             var reward = this.rewards[result];
             var lastState = this.matrix[this.lastBoard];
-            var lastStateActionVal = lastState[this.lastAction];
+            if (!lastState) return;
+            var lastStateActionVal = lastState[this.lastAction] || 0;
             var curPts = this.curPts || 0;
             var points = lastStateActionVal + this.alpha * (reward + curPts - lastStateActionVal);
             points = ((points * 1000) | 0) / 1000;
@@ -201,9 +202,12 @@ var Q = (function() {
         return LOCAL_STORAGE_KEY + '_' + grid + '_' + streak;
     }
 
-    function _hashBoard(board, mySymbol) {
+    function _hashBoard(board, mySymbol, inversions) {
         // creating hashes of the board, to store as keys for the state info for Q
         // 0 = null, a = me, b = opponent
+        var mine = inversions ? 'a' : 'b';
+        var opp = inversions ? 'b' : 'a';
+
         return 'h_' + _.map(_.flatten(board), function(symbol) {
             if (!symbol) return 0;
             if (symbol === mySymbol) return 'a';
@@ -212,6 +216,8 @@ var Q = (function() {
     }
 
     function _permutationSearch(board, matrix, mySymbol) {
+        var testBoard;
+        var hash;
         var mutations = {
             turns: 0,
             flips: 0,
@@ -221,10 +227,13 @@ var Q = (function() {
         var flips = 1;
         while (flips--) {
             mutations['flips'] = flips;
-            board = _flip(board, flips);
-            var hash = _hashBoard(board, mySymbol);
-            mutations['hash'] = hash;
-            if (hash in matrix) return mutations;
+            testBoard = _flip(board, flips);
+            var inversions = 1;
+            while (inversions--) {
+                hash = _hashBoard(testBoard, mySymbol, inversions);
+                mutations['hash'] = hash;
+                if (hash in matrix) return mutations;
+            }
         }
         return false;
     }
