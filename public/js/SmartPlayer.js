@@ -6,7 +6,7 @@ var SmartPlayer = (function() {
     function SmartPlayer(opts) {
         new Player(opts);
         this.id = _.uniqueId('smart');
-        this.Q = new Q(opts);
+        this.algo = this.useMinimax ? new Minimax(opts) : new Q(opts);
     }
 
     SmartPlayer.prototype = new Player({
@@ -18,16 +18,16 @@ var SmartPlayer = (function() {
 
         start: function(opts) {
             Player.prototype.start.apply(this, arguments);
-            this.Q.start(this.game);
+            this.algo.start(this.game);
         },
 
         onYouLose: function() {
-            this.Q.trigger('reward_activity', 'lose');
+            this.algo.trigger('reward_activity', 'lose');
             Player.prototype.onYouLose.apply(this, arguments);
         },
 
         onCat: function() {
-            this.Q.trigger('reward_activity', 'cat');
+            this.algo.trigger('reward_activity', 'cat');
             Player.prototype.onCat.apply(this, arguments);
         },
 
@@ -38,36 +38,36 @@ var SmartPlayer = (function() {
         },
 
         setDiscover: function(discover) {
-            this.Q.trigger('set_discover', discover);
+            this.algo.trigger('set_discover', discover);
         },
 
         onToggleComputer: function() {},
 
         clearQ: function() {
-            this.Q.trigger('clear');
+            this.algo.trigger('clear');
         },
 
         pause: function() {
-            this.Q.trigger('pause');
+            this.algo.trigger('pause');
         },
 
         restart: function() {
-            this.Q.trigger('restart');
+            this.algo.trigger('restart');
         },
 
         setSymbol: function(symbol) {
             Player.prototype.setSymbol.apply(this, arguments);
-            this.Q.setSymbol(symbol);
+            this.algo.setSymbol(symbol);
         },
 
         onYouWon: function() {
-            this.Q.trigger('reward_activity', 'win');
+            this.algo.trigger('reward_activity', 'win');
             Player.prototype.onYouWon.apply(this, arguments);
         },
 
         play: function(board) {
             var options = _getOptions(board);
-            var choice = this.Q.choose(board, options);
+            var choice = this.algo.choose(board, options);
             this.trigger('select_square', choice.x, choice.y);
         }
     });
