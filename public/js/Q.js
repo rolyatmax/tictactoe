@@ -65,7 +65,7 @@ var Q = (function() {
             this.stack = [];
 
             return $.ajax({
-                url: '/q',
+                url: 'q',
                 data: JSON.stringify({qs: qs}),
                 contentType: 'application/json; charset=utf-8',
                 dataType: 'json',
