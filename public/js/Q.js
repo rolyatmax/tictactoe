@@ -169,6 +169,9 @@ var Q = (function() {
 
             var reward = this.rewards[result];
             var lastState = this.matrix[this.lastBoard];
+            if (!lastState) {
+                return;
+            }
             var lastStateActionVal = lastState[this.lastAction];
             var curPts = this.curPts || 0;
             var points = lastStateActionVal + this.alpha * (reward + curPts - lastStateActionVal);
