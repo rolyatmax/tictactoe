@@ -11,7 +11,7 @@ var Q = (function() {
         'alpha': 0.3,
         'rewards': {
             'alive': 10,
-            'win': 500,
+            'win': 20,
             'lose': -1000,
             'cat': 10
         }
