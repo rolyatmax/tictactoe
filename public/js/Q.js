@@ -176,7 +176,7 @@ var Q = (function() {
             var lastStateActionVal = lastState[this.lastAction];
             var curPts = this.curPts || 0;
             var points = lastStateActionVal + this.alpha * (reward + curPts - lastStateActionVal);
-            points = ((points * 1000) | 0) / 1000;
+            points = ((points * 10) | 0) / 10;
             lastState[this.lastAction] = points;
 
             this.push({
@@ -197,7 +197,7 @@ var Q = (function() {
     function _hashBoard(board, mySymbol) {
         // creating hashes of the board, to store as keys for the state info for Q
         // 0 = null, a = me, b = opponent
-        return 'h_' + _.map(_.flatten(board), function(symbol) {
+        return _.map(_.flatten(board), function(symbol) {
             if (!symbol) return 0;
             if (symbol === mySymbol) return 'a';
             return 'b';
