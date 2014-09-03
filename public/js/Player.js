@@ -10,7 +10,13 @@ var Player = (function() {
     function Player(opts) {
         opts = _.defaults(opts || {}, defaults);
         _.extend(this, opts);
-        this.id = _.uniqueId('p');
+
+        var prefix = this.isSmart ? 'smart' : 'p';
+        this.id = _.uniqueId(prefix);
+        if (this.isSmart) {
+            this.isComputer = true;
+            this.Q = new Q(opts);
+        }
     }
 
     _.extend(Player.prototype, Backbone.Events, {
@@ -22,6 +28,10 @@ var Player = (function() {
             this.bindEvents();
             this.trigger('request_symbol');
             this.createScorecard();
+
+            if (this.isSmart) {
+                this.Q.start(this.game);
+            }
         },
 
         createScorecard: function() {
@@ -39,29 +49,61 @@ var Player = (function() {
             this.listenTo(this, 'cat', this.onCat);
             this.listenTo(this, 'you_won', this.onYouWon);
             this.listenTo(this, 'toggle_computer', this.onToggleComputer);
+            this.listenTo(this, 'clear_q', this.clearQ);
+            this.listenTo(this, 'set_discover', this.setDiscover);
 
             this._eventsBound = true;
         },
 
         onToggleComputer: function() {
+            if (this.isSmart) {
+                return;
+            }
             this.isComputer = !this.isComputer;
+        },
+
+        clearQ: function() {
+            if (this.isSmart) {
+                this.Q.trigger('clear');
+            }
         },
 
         setSymbol: function(symbol) {
             this.symbol = symbol;
+            if (this.isSmart) {
+                this.Q.setSymbol(symbol);
+            }
+        },
+
+        setDiscover: function(discover) {
+            if (this.isSmart) {
+                this.Q.trigger('set_discover', discover);
+            }
         },
 
         onCat: function() {
+            if (this.isSmart) {
+                this.Q.trigger('reward_activity', 'cat');
+            }
+
             this.total += 1;
             this.trigger('new_game');
         },
 
         onYouLose: function() {
+            if (this.isSmart) {
+                this.Q.trigger('reward_activity', 'lose');
+            }
+
             this.total += 1;
             this.trigger('new_game');
         },
 
         onYouWon: function() {
+            if (this.isSmart) {
+                this.Q.trigger('reward_activity', 'win');
+            }
+
             this.wins += 1;
             this.total += 1;
             this.renderScore();
@@ -81,9 +123,17 @@ var Player = (function() {
         play: function(board) {
             if (!this.isComputer) return;
 
-            var options = _getOptions(board);
+            var options, choice;
+            if (this.isSmart) {
+                options = _getOptions(board);
+                choice = this.Q.choose(board, options);
+                this.trigger('select_square', choice.x, choice.y);
+                return;
+            }
+
+            options = _getOptions(board);
             var i = _.random(0, options.length - 1);
-            var choice = options[i];
+            choice = options[i];
             this.trigger('select_square', choice.x, choice.y);
         }
     });

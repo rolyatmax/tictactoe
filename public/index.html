@@ -17,7 +17,6 @@
 
     <script src="js/Q.js"></script>
     <script src="js/Player.js"></script>
-    <script src="js/SmartPlayer.js"></script>
 	<script src="js/Square.js"></script>
 	<script src="js/TicTacToe.js"></script>
 	<script>
@@ -26,10 +25,12 @@
                     'grid': 3,
                     'streak': 3,
                 'players': [
-                    new SmartPlayer(),
                     new Player({
-                        'isComputer': true,
-                        // 'discover': 0.3,
+                        'isSmart': true
+                    }),
+                    new Player({
+                        'isSmart': true,
+                        'discover': 0.4
                     })
                 ]
             });
