@@ -175,9 +175,10 @@ var TicTacToe = (function() {
         },
 
         selectSquare: function(player, x, y) {
-            if (player !== this.currentPlayer); // throw 'Not current player';
+            if (player !== this.currentPlayer) return; // throw 'Not current player';
             var square = this.getSquareByCoords(x, y);
             if (square.value) throw 'Square already taken';
+            if (!_isOption(square, _getOptions(this.board, this.gravity))) throw 'Not an option';
             square.setValue(this.currentPlayer.symbol);
             this.updateBoard();
             this.nextTurn();
@@ -364,6 +365,13 @@ var TicTacToe = (function() {
             }
         }
         return options;
+    }
+
+    function _isOption(square, options) {
+        var hashes = _.map(options, function(option) {
+            return option.x + DELIMITER + option.y;
+        });
+        return _.contains(hashes, square.x + DELIMITER + square.y);
     }
 
     return TicTacToe;
