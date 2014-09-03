@@ -7,7 +7,7 @@ var Q = (function() {
     var defaults = {
         'useLocalStorage': false,
         'saveInterval': 5000,
-        'discover': 0.0,
+        'discover': 0.05,
         'alpha': 0.3,
         'rewards': {
             'alive': 10,
@@ -134,7 +134,8 @@ var Q = (function() {
         getState: function(board) {
             this.mutations = _permutationSearch(board, this.matrix, this.symbol);
             var hash = this.mutations ? this.mutations['hash'] : _hashBoard(board, this.symbol);
-            return this.matrix[hash] || (this.matrix[hash] = {});
+            this.matrix[hash] = this.matrix[hash] || {};
+            return this.matrix[hash];
         },
 
         choose: function(board, options) {
