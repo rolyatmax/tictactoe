@@ -109,8 +109,8 @@ var Player = (function() {
             this.renderScore();
         },
 
-        onTurn: function(board) {
-            var play = _.partial(this.play.bind(this), board);
+        onTurn: function(board, options) {
+            var play = this.play.bind(this, board, options);
             setTimeout(play, this.delay || 0);
         },
 
@@ -120,43 +120,13 @@ var Player = (function() {
             this.$scorecard.text(text);
         },
 
-        play: function(board) {
+        play: function(board, options) {
             if (!this.isComputer) return;
 
-            var options, choice;
-            if (this.isSmart) {
-                options = _getOptions(board);
-                choice = this.Q.choose(board, options);
-                this.trigger('select_square', choice.x, choice.y);
-                return;
-            }
-
-            options = _getOptions(board);
-            var i = _.random(0, options.length - 1);
-            choice = options[i];
+            var choice = this.isSmart ? this.Q.choose(board, options) : _.sample(options, 1)[0];
             this.trigger('select_square', choice.x, choice.y);
         }
     });
-
-
-    /////////// helpers
-    function _getOptions(board) {
-        var options = [];
-        var y = board.length;
-        while (y--) {
-            var x = board[y].length;
-            while (x--) {
-                if (!board[y][x]) {
-                    options.push({
-                        'x': x,
-                        'y': y
-                    });
-                }
-            }
-        }
-        return options;
-    }
-
 
     return Player;
 })();

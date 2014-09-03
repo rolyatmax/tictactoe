@@ -8,6 +8,7 @@ var TicTacToe = (function() {
         'el': '#game',
         'grid': 3,
         'streak': 3,
+        'gravity': false,
         'players': []
     };
 
@@ -143,7 +144,7 @@ var TicTacToe = (function() {
             var curIdx = _.indexOf(this.players, this.currentPlayer);
             var nextIdx = (curIdx + 1) % this.players.length;
             this.currentPlayer = this.players[nextIdx];
-            this.currentPlayer.trigger('your_turn', this.board);
+            this.currentPlayer.trigger('your_turn', this.board, _getOptions(this.board, this.gravity));
         },
 
         onClickSquare: function(e) {
@@ -220,10 +221,8 @@ var TicTacToe = (function() {
         },
 
         getSquareByCoords: function(x, y) {
-            return _.findWhere(_.values(this.squares), {
-                'x': parseInt(x, 10),
-                'y': parseInt(y, 10)
-            });
+            var key = x + DELIMITER + y;
+            return this.squares[key];
         },
 
         getPlayerBySymbol: function(symbol) {
@@ -346,7 +345,26 @@ var TicTacToe = (function() {
         return true;
     }
 
-
+    // gravity is for connect four, games like tictactoe don't have gravity as a factor
+    function _getOptions(board, gravity) {
+        var options = [];
+        var x = board[0].length;
+        while (x--) {
+            var y = board.length;
+            while (y--) {
+                if (!board[y][x]) {
+                    options.push({
+                        'x': x,
+                        'y': y
+                    });
+                    if (gravity) {
+                        break;
+                    }
+                }
+            }
+        }
+        return options;
+    }
 
     return TicTacToe;
 })();
