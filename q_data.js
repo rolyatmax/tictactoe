@@ -41,6 +41,8 @@ var qData = {
         this.data[name] = this.data[name] || {};
         this.data[name][stateHash] = this.data[stateHash] || {};
         this.data[name][stateHash][actionHash] = val;
+
+        this.updated = true;
     },
 
     get: function() {
@@ -48,12 +50,17 @@ var qData = {
     },
 
     backup: function(fn, cb) {
+        if (!this.updated) {
+            return;
+        }
+
         fn = fn || filename;
         fs.writeFile(fn, JSON.stringify(this.data), function(err) {
             if (err) throw err;
             if (cb) cb();
-            console.log('Backup created');
-        });
+            console.log('Backup created', new Date());
+            this.updated = false;
+        }.bind(this));
     },
 
     read: function() {
