@@ -10,10 +10,10 @@ var Q = (function() {
         'discover': 0.05,
         'alpha': 0.3,
         'rewards': {
-            'alive': 10,
-            'win': 20,
+            'alive': 1,
+            'win': 10,
             'lose': -1000,
-            'cat': 10
+            'cat': 1
         }
     };
 

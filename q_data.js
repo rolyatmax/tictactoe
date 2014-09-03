@@ -39,8 +39,13 @@ var qData = {
         var val = data['val'];
 
         this.data[name] = this.data[name] || {};
-        this.data[name][stateHash] = this.data[stateHash] || {};
+        this.data[name][stateHash] = this.data[name][stateHash] || {};
+
+        // console.log('saving start:', this.data[name][stateHash][actionHash]);
+
         this.data[name][stateHash][actionHash] = val;
+
+        // console.log('saving end:', this.data[name][stateHash][actionHash]);
 
         this.updated = true;
     },
