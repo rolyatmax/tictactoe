@@ -7,8 +7,8 @@ var Q = (function() {
     var defaults = {
         'useLocalStorage': false,
         'saveInterval': 5000,
-        'discover': 0.05,
-        'alpha': 0.3,
+        'discover': 0.0,
+        'alpha': 0.9,
         'rewards': {
             'alive': 1,
             'win': 10,
