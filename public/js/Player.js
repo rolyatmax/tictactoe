@@ -116,7 +116,7 @@ var Player = (function() {
 
         renderScore: function() {
             var perc = ((this.wins / this.total * 100000) | 0) / 1000;
-            var text = this.id + ': ' + this.wins + ' - ' + perc + '%';
+            var text = this.id + ': ' + this.wins; // + ' - ' + perc + '%';
             this.$scorecard.text(text);
         },
 
