@@ -1,6 +1,4 @@
 var Player = (function() {
-    'use strict';
-
     var defaults = {
         'symbol': null,
         'isComputer': false,
@@ -124,9 +122,10 @@ var Player = (function() {
             if (!this.isComputer) return;
 
             var choice = this.isSmart ? this.Q.choose(board, options) : _.sample(options, 1)[0];
-            this.trigger('select_square', choice.x, choice.y);
+            this.trigger('select_square', choice);
         }
     });
 
     return Player;
+
 })();

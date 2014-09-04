@@ -141,11 +141,12 @@ var Q = (function() {
         choose: function(board, options) {
             var state = this.getState(board);
 
+            options = _transformOpts(options);
             _.each(options, function(option) {
                 var mutated = _mutate(option, this.mutations);
                 option['x'] = mutated['x'];
                 option['y'] = mutated['y'];
-                var actionHash = option['x'] + DELIMITER + option['y'];
+                var actionHash = _hashSquareObj(option);
                 option['hash'] = actionHash;
                 option['points'] = state[actionHash] || (state[actionHash] = 0);
             }.bind(this));
@@ -162,7 +163,8 @@ var Q = (function() {
             var hash = this.mutations ? this.mutations['hash'] : _hashBoard(board, this.symbol);
             this.lastBoard = hash;
             this.lastAction = action['hash'];
-            return _mutate(action, this.mutations, true);
+            var choice = _mutate(action, this.mutations, true);
+            return _hashSquareObj(choice);
         },
 
         evaluateLast: function(result) {
@@ -202,6 +204,20 @@ var Q = (function() {
             if (symbol === mySymbol) return 'a';
             return 'b';
         }).join('');
+    }
+
+    function _transformOpts(options) {
+        return _.map(options, function(option) {
+            var coords = option.split(DELIMITER);
+            return {
+                x: coords[0],
+                y: coords[1]
+            };
+        });
+    }
+
+    function _hashSquareObj(obj) {
+        return obj.x + DELIMITER + obj.y;
     }
 
     function _permutationSearch(board, matrix, mySymbol) {

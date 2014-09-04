@@ -100,8 +100,8 @@ var TicTacToe = (function() {
             this.$el.on('blur', 'input.discover', this.setDiscover.bind(this));
 
             _.each(this.players, function(player) {
-                var selectHandler = _.partial(this.selectSquare, player);
-                var requestSymbolHandler = _.partial(this.requestSymbol, player);
+                var selectHandler = this.selectSquare.bind(this, player);
+                var requestSymbolHandler = this.requestSymbol.bind(this, player);
                 this.listenTo(player, 'select_square', selectHandler);
                 this.listenTo(player, 'new_game', this.reset);
                 this.listenToOnce(player, 'request_symbol', requestSymbolHandler);
@@ -152,8 +152,7 @@ var TicTacToe = (function() {
 
             var $target = $(e.currentTarget);
             var uid = $target.data('uid');
-            var coords = uid.split(DELIMITER);
-            this.selectSquare(this.currentPlayer, coords[0], coords[1]);
+            this.selectSquare(this.currentPlayer, uid);
         },
 
         onKeyPress: function(e) {
@@ -174,11 +173,12 @@ var TicTacToe = (function() {
             }.bind(this));
         },
 
-        selectSquare: function(player, x, y) {
+        selectSquare: function(player, choice) {
             if (player !== this.currentPlayer) return; // throw 'Not current player';
-            var square = this.getSquareByCoords(x, y);
+            var square = this.squares[choice];
             if (square.value) throw 'Square already taken';
-            if (!_isOption(square, _getOptions(this.board, this.gravity))) throw 'Not an option';
+            var options = _getOptions(this.board, this.gravity);
+            if (!_.contains(options, square.uid)) throw 'Not an option';
             square.setValue(this.currentPlayer.symbol);
             this.updateBoard();
             this.nextTurn();
@@ -219,11 +219,6 @@ var TicTacToe = (function() {
 
         requestSymbol: function(player) {
             player.trigger('take_symbol', _getSymbol());
-        },
-
-        getSquareByCoords: function(x, y) {
-            var key = x + DELIMITER + y;
-            return this.squares[key];
         },
 
         getPlayerBySymbol: function(symbol) {
@@ -354,10 +349,7 @@ var TicTacToe = (function() {
             var y = board.length;
             while (y--) {
                 if (!board[y][x]) {
-                    options.push({
-                        'x': x,
-                        'y': y
-                    });
+                    options.push(x + DELIMITER + y);
                     if (gravity) {
                         break;
                     }
@@ -368,10 +360,7 @@ var TicTacToe = (function() {
     }
 
     function _isOption(square, options) {
-        var hashes = _.map(options, function(option) {
-            return option.x + DELIMITER + option.y;
-        });
-        return _.contains(hashes, square.x + DELIMITER + square.y);
+        return _.contains(options, square.uid);
     }
 
     return TicTacToe;
