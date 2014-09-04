@@ -2,7 +2,7 @@ var TicTacToe = (function() {
     'use strict';
 
     var DELIMITER = '|';
-    var symbols = 'abcdefghijklmnopqrstuvwxyz'.split('');
+    var symbols = 'xo'.split('');
 
     var defaults = {
         'el': '#game',
@@ -29,13 +29,11 @@ var TicTacToe = (function() {
 
         reset: function() {
             if (this.playing) return;
-            this.hideNotification();
             _.each(this.squares, function(square) {
                 square.setValue(null);
             });
             this.board = _createBoard(this.grid);
-            var i = _.random(0, this.players.length - 1);
-            this.currentPlayer = this.players[i];
+            this.currentPlayer = _.sample(this.players, 1)[0];
             this.playing = true;
             this.nextTurn();
         },
@@ -48,13 +46,10 @@ var TicTacToe = (function() {
 
             var els = _.pluck(_.values(this.squares), '$el');
             var $squares = $('<div>').addClass('squares').append(els);
-            var $clear = $('<div>').addClass('clear').text('Clear matrix');
-            var $notification = $('<div>').addClass('notification');
             var $scores = $('<div>').addClass('scores');
             var $toggle = $('<div>').addClass('toggle').text('Toggle Computer');
-            var $discover = $('<input type="text">').addClass('discover');
             this.$el.empty();
-            this.$el.append($squares, $notification, $scores, $clear, $toggle, $discover);
+            this.$el.append($squares, $scores, $toggle);
 
             // styling
             var w = $squares.width();
@@ -74,7 +69,7 @@ var TicTacToe = (function() {
                 this.players.push(new Player());
             }
 
-            this.currentPlayer = this.players[0];
+            this.currentPlayer = _.sample(this.players, 1)[0];
         },
 
         start: function() {
@@ -94,64 +89,49 @@ var TicTacToe = (function() {
             $(document).on('keypress', this.onKeyPress.bind(this));
 
             this.$el.on('click', '.square', this.onClickSquare.bind(this));
-            this.$el.on('click', '.notification.show', this.reset.bind(this));
-            this.$el.on('click', '.clear', this.clearQ.bind(this));
             this.$el.on('click', '.toggle', this.toggleComputer.bind(this));
-            this.$el.on('blur', 'input.discover', this.setDiscover.bind(this));
 
             _.each(this.players, function(player) {
                 var selectHandler = this.selectSquare.bind(this, player);
-                var requestSymbolHandler = this.requestSymbol.bind(this, player);
                 this.listenTo(player, 'select_square', selectHandler);
-                this.listenTo(player, 'new_game', this.reset);
-                this.listenToOnce(player, 'request_symbol', requestSymbolHandler);
                 this.listenToOnce(player, 'insert_scorecard', this.onInsertScoreCard);
             }.bind(this));
 
             this._eventsBound = true;
         },
 
-        setDiscover: function() {
-            var val = $('input.discover').val();
-            _.each(this.players, function(player) {
-                player.trigger('set_discover', val);
-            });
-        },
-
         nextTurn: function() {
             if (!this.playing) return;
-
             var winner = this.checkForWin();
             if (winner) {
                 this.playing = false;
-                this.showNotification(winner.id + ' won!');
                 _.each(this.players, function(player) {
                     var ev = player === winner ? 'you_won' : 'you_lose';
                     player.trigger(ev);
                 }.bind(this));
+                this.reset();
                 return;
             }
 
             if (this.checkForCat()) {
                 this.playing = false;
-                this.showNotification('CAT!');
                 _.each(this.players, function(player) {
                     player.trigger('cat');
                 }.bind(this));
+                this.reset();
                 return;
             }
 
             var curIdx = _.indexOf(this.players, this.currentPlayer);
             var nextIdx = (curIdx + 1) % this.players.length;
             this.currentPlayer = this.players[nextIdx];
-            this.currentPlayer.trigger('your_turn', this.board, _getOptions(this.board, this.gravity));
+            var options = _getOptions(this.board, this.gravity);
+            this.currentPlayer.trigger('your_turn', this.board, options);
         },
 
         onClickSquare: function(e) {
             if (this.currentPlayer.isComputer) return;
-
-            var $target = $(e.currentTarget);
-            var uid = $target.data('uid');
+            var uid = $(e.currentTarget).data('uid');
             this.selectSquare(this.currentPlayer, uid);
         },
 
@@ -165,14 +145,6 @@ var TicTacToe = (function() {
             this.$('.scores').append($el);
         },
 
-        clearQ: function() {
-            _.each(this.players, function(player) {
-                if (player['isComputer']) {
-                    player.trigger('clear_q');
-                }
-            }.bind(this));
-        },
-
         selectSquare: function(player, choice) {
             if (player !== this.currentPlayer) return; // throw 'Not current player';
             var square = this.squares[choice];
@@ -182,16 +154,6 @@ var TicTacToe = (function() {
             square.setValue(this.currentPlayer.symbol);
             this.updateBoard();
             this.nextTurn();
-        },
-
-        hideNotification: function() {
-            $('.notification').removeClass('show');
-        },
-
-        showNotification: function(msg) {
-            var $notification = this.$('.notification');
-            if (msg) $notification.text(msg);
-            $notification.addClass('show');
         },
 
         updateBoard: function() {
@@ -217,8 +179,8 @@ var TicTacToe = (function() {
             return _.every(_.flatten(this.board));
         },
 
-        requestSymbol: function(player) {
-            player.trigger('take_symbol', _getSymbol());
+        requestSymbol: function() {
+            return _getSymbol();
         },
 
         getPlayerBySymbol: function(symbol) {
@@ -237,9 +199,7 @@ var TicTacToe = (function() {
         },
 
         toggleComputer: function() {
-            _.each(this.players, function(player) {
-                player.trigger('toggle_computer');
-            });
+            this.players[1].trigger('toggle_computer');
             this.nextTurn();
         },
 

@@ -24,7 +24,7 @@ var Player = (function() {
             this.wins = 0;
             this.total = 0;
             this.bindEvents();
-            this.trigger('request_symbol');
+            this.setSymbol();
             this.createScorecard();
 
             if (this.isSmart) {
@@ -42,59 +42,32 @@ var Player = (function() {
             if (this._eventsBound) return;
 
             this.listenTo(this, 'your_turn', this.onTurn);
-            this.listenTo(this, 'take_symbol', this.setSymbol);
-            this.listenTo(this, 'you_lose', this.onYouLose);
-            this.listenTo(this, 'cat', this.onCat);
+            this.listenTo(this, 'you_lose', this.onCatOrLose.bind(this, 'lose'));
+            this.listenTo(this, 'cat', this.onCatOrLose.bind(this, 'cat'));
             this.listenTo(this, 'you_won', this.onYouWon);
             this.listenTo(this, 'toggle_computer', this.onToggleComputer);
-            this.listenTo(this, 'clear_q', this.clearQ);
-            this.listenTo(this, 'set_discover', this.setDiscover);
 
             this._eventsBound = true;
         },
 
         onToggleComputer: function() {
-            if (this.isSmart) {
-                return;
-            }
             this.isComputer = !this.isComputer;
         },
 
-        clearQ: function() {
-            if (this.isSmart) {
-                this.Q.trigger('clear');
-            }
-        },
-
-        setSymbol: function(symbol) {
+        setSymbol: function() {
+            var symbol = this.game.requestSymbol();
             this.symbol = symbol;
             if (this.isSmart) {
                 this.Q.setSymbol(symbol);
             }
         },
 
-        setDiscover: function(discover) {
+        onCatOrLose: function(reward) {
             if (this.isSmart) {
-                this.Q.trigger('set_discover', discover);
-            }
-        },
-
-        onCat: function() {
-            if (this.isSmart) {
-                this.Q.trigger('reward_activity', 'cat');
+                this.Q.trigger('reward_activity', reward);
             }
 
             this.total += 1;
-            this.trigger('new_game');
-        },
-
-        onYouLose: function() {
-            if (this.isSmart) {
-                this.Q.trigger('reward_activity', 'lose');
-            }
-
-            this.total += 1;
-            this.trigger('new_game');
         },
 
         onYouWon: function() {
@@ -113,9 +86,7 @@ var Player = (function() {
         },
 
         renderScore: function() {
-            var perc = ((this.wins / this.total * 100000) | 0) / 1000;
-            var text = this.id + ': ' + this.wins; // + ' - ' + perc + '%';
-            this.$scorecard.text(text);
+            this.$scorecard.text(this.id + ': ' + this.wins);
         },
 
         play: function(board, options) {

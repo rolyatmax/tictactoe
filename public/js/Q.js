@@ -5,7 +5,6 @@ var Q = (function() {
     var LOCAL_STORAGE_KEY = 'q';
 
     var defaults = {
-        'useLocalStorage': false,
         'saveInterval': 5000,
         'discover': 0.0,
         'alpha': 0.9,
@@ -29,13 +28,8 @@ var Q = (function() {
     _.extend(Q.prototype, Backbone.Events, {
         start: function(game) {
             this.game = game;
-            $('input.discover').val(this.discover);
             this.name = _localStorageKey(this.game.grid, this.game.streak);
-            if (this.useLocalStorage) {
-                this.loadMatrix();
-                this.saveMatrix();
-            }
-            this.send();
+            this.sendLoop();
             this.started = true;
         },
 
@@ -43,16 +37,8 @@ var Q = (function() {
             this.stack.push(data);
         },
 
-        set: function(attrs) {
-            attrs = _.pick(attrs, _.keys(defaults));
-            _.extend(this, attrs);
-            _.each(attrs, function(val, attr) {
-                this.trigger('change:' + attr);
-            }.bind(this));
-        },
-
-        send: function() {
-            setTimeout(this.send.bind(this), 10000);
+        sendLoop: function() {
+            setTimeout(this.sendLoop.bind(this), 10000);
             this.sendData();
         },
 
@@ -76,55 +62,10 @@ var Q = (function() {
             }.bind(this));
         },
 
-        loadMatrix: function() {
-            if (!this.useLocalStorage) {
-                return;
-            }
-
-            var q = localStorage.getItem(this.name);
-            this.matrix = q ? JSON.parse(q) : {};
-            if (q) console.log('using stored Q:', this.name);
-        },
-
-        saveMatrix: function() {
-            if (!this.useLocalStorage) {
-                return;
-            }
-            if (this.saveInterval) {
-                setTimeout(this.saveMatrix.bind(this), this.saveInterval);
-            }
-            localStorage.setItem(this.name, JSON.stringify(this.matrix));
-            console.log('saved to localStorage');
-        },
-
         bindEvents: function() {
             if (this._eventsBound) return;
             this.listenTo(this, 'reward_activity', this.evaluateLast);
-            this.listenTo(this, 'clear', this.clear);
-            this.listenTo(this, 'set_discover', this.setDiscover);
             this._eventsBound = true;
-        },
-
-        setDiscover: function(discover) {
-            this.discover = parseFloat(discover, 10);
-            console.log('Discover set to:', this.discover);
-        },
-
-        clear: function() {
-            var qs = {
-                'reset': true
-            };
-
-            return $.ajax({
-                url: '/q',
-                data: JSON.stringify({qs: qs}),
-                contentType: 'application/json; charset=utf-8',
-                dataType: 'json',
-                type: 'POST'
-            }).done(function(res) {
-                localStorage.setItem(this.name, '');
-                window.location.reload();
-            }.bind(this));
         },
 
         setSymbol: function(symbol) {
@@ -157,7 +98,7 @@ var Q = (function() {
             var chooseRandom = (min['points'] === max['points'] || Math.random() < this.discover);
             var action = chooseRandom ? options[_.random(0, options.length - 1)] : max;
 
-            this.curPts = action['points'];
+            this.lastPts = action['points'];
             this.trigger('reward_activity', 'alive');
 
             var hash = this.mutations ? this.mutations['hash'] : _hashBoard(board, this.symbol);
@@ -176,8 +117,8 @@ var Q = (function() {
                 return;
             }
             var lastStateActionVal = lastState[this.lastAction];
-            var curPts = this.curPts || 0;
-            var points = lastStateActionVal + this.alpha * (reward + curPts - lastStateActionVal);
+            var lastPts = this.lastPts || 0;
+            var points = lastStateActionVal + this.alpha * (reward + lastPts - lastStateActionVal);
             points = ((points * 10) | 0) / 10;
             lastState[this.lastAction] = points;
 
