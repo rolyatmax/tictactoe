@@ -44,12 +44,8 @@ var TicTacToe = (function() {
             this.board = _createBoard(this.grid);
             this.squares = _createSquares(this.board);
 
-            var els = _.pluck(_.values(this.squares), '$el');
-            var $squares = $('<div>').addClass('squares').append(els);
-            var $scores = $('<div>').addClass('scores');
-            var $toggle = $('<div>').addClass('toggle').text('Toggle Computer');
-            this.$el.empty();
-            this.$el.append($squares, $scores, $toggle);
+            var els = _.pluck(this.squares, '$el');
+            var $squares = this.$('.squares').append(els);
 
             // styling
             var w = $squares.width();
@@ -237,7 +233,7 @@ var TicTacToe = (function() {
                 var uid = j + DELIMITER + i;
                 var val = board[i][j];
                 var opts = {
-                    '$el': $('<div>').addClass('square').data('uid', uid),
+                    '$el': $('<div>').addClass('square').attr('data-uid', uid),
                     'x': j,
                     'y': i,
                     'uid': uid
