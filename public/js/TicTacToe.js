@@ -124,6 +124,7 @@ var TicTacToe = (function() {
             var nextIdx = (curIdx + 1) % this.players.length;
             this.currentPlayer = this.players[nextIdx];
             var options = _getOptions(this.board, this.gravity);
+            $('.square.highlight').removeClass('highlight');
             this.currentPlayer.trigger('your_turn', this.board, options);
         },
 

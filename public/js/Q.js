@@ -35,6 +35,7 @@ var Q = (function() {
 
         push: function(data) {
             this.stack.push(data);
+            console.log('Reward:', data);
         },
 
         sendLoop: function() {
@@ -147,11 +148,13 @@ var Q = (function() {
                 'name': this.name,
                 'stateHash': this.lastBoard,
                 'actionHash': this.lastAction,
-                'val': points
+                'val': points,
+                'reward': reward
             });
 
             if (result !== 'alive') {
                 this.lastBoard = this.lastAction = this.lastPts = 0;
+                $('.choices').empty();
             }
         }
 
