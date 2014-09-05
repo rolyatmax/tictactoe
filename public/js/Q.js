@@ -6,8 +6,8 @@ var Q = (function() {
 
     var defaults = {
         'saveInterval': 5000,
-        'discover': 0.0,
-        'alpha': 0.9,
+        'discover': 0.2,
+        'alpha': 0.5,
         'rewards': {
             'alive': 1,
             'win': 10,
@@ -79,6 +79,19 @@ var Q = (function() {
             return this.matrix[hash];
         },
 
+        showChoices: function(choices) {
+            var $choices = $('.choices');
+            $choices.empty();
+            choices = _.sortBy(choices, function(choice) {
+                return -choice.points;
+            });
+            _.each(choices, function(choice) {
+                var text = choice.coords + ': ' + choice.points;
+                var $choice = $('<span>').attr('data-uid', choice.coords).text(text);
+                $choices.append($choice);
+            });
+        },
+
         choose: function(board, options) {
             var state = this.getState(board);
 
@@ -105,6 +118,14 @@ var Q = (function() {
             this.lastBoard = hash;
             this.lastAction = action['hash'];
             var choice = _mutate(action, this.mutations, true);
+            var choices = _.map(options, function(option) {
+                option = _mutate(option, this.mutations, true);
+                return {
+                    'coords': _hashSquareObj(option),
+                    'points': option['points']
+                };
+            }.bind(this));
+            this.showChoices(choices);
             return _hashSquareObj(choice);
         },
 
@@ -128,6 +149,10 @@ var Q = (function() {
                 'actionHash': this.lastAction,
                 'val': points
             });
+
+            if (result !== 'alive') {
+                this.lastBoard = this.lastAction = this.lastPts = 0;
+            }
         }
 
     });
@@ -215,7 +240,7 @@ var Q = (function() {
 
     function _mutate(action, mutations, reverse) {
         action = _.clone(action);
-        var newAction = _.clone(action);
+        var newAction = _.pick(action, 'x', 'y', 'points');
         var lastX = mutations['boardSize'] - 1;
         var turns = reverse ? 4 - mutations['turns'] : mutations['turns'];
         var flips = mutations['flips'];

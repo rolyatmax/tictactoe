@@ -86,6 +86,8 @@ var TicTacToe = (function() {
 
             this.$el.on('click', '.square', this.onClickSquare.bind(this));
             this.$el.on('click', '.toggle', this.toggleComputer.bind(this));
+            this.$el.on('mouseover', '.choices span', this.onMouseoverChoice.bind(this));
+            this.$el.on('mouseout', '.choices span', this.onMouseoutChoice.bind(this));
 
             _.each(this.players, function(player) {
                 var selectHandler = this.selectSquare.bind(this, player);
@@ -123,6 +125,16 @@ var TicTacToe = (function() {
             this.currentPlayer = this.players[nextIdx];
             var options = _getOptions(this.board, this.gravity);
             this.currentPlayer.trigger('your_turn', this.board, options);
+        },
+
+        onMouseoverChoice: function(e) {
+            var uid = $(e.currentTarget).data('uid');
+            $('.square[data-uid="' + uid + '"]').addClass('highlight');
+        },
+
+        onMouseoutChoice: function(e) {
+            var uid = $(e.currentTarget).data('uid');
+            $('.square[data-uid="' + uid + '"]').removeClass('highlight');
         },
 
         onClickSquare: function(e) {

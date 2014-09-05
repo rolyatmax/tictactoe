@@ -33,11 +33,19 @@ hr {
 
 .square {
   -webkit-user-select: none;
-  border: 1px solid #aaa;
+  border: 2px solid #aaa;
   float: left;
   text-align: center;
   color: #555;
   text-transform: uppercase; }
+  .square.highlight {
+    border-color: red; }
+
+.choices {
+  position: absolute;
+  top: 0; }
+  .choices span {
+    display: block; }
 
 .clear, .toggle {
   text-align: center;
