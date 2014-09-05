@@ -6,7 +6,7 @@ var Q = (function() {
 
     var defaults = {
         'saveInterval': 5000,
-        'discover': 0.2,
+        'discover': 0.0,
         'alpha': 0.5,
         'rewards': {
             'alive': 1,
