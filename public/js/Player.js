@@ -82,7 +82,8 @@ var Player = (function() {
 
         onTurn: function(board, options) {
             var play = this.play.bind(this, board, options);
-            setTimeout(play, this.delay || 0);
+            play();
+            // setTimeout(play, this.delay || 0);
         },
 
         renderScore: function() {

@@ -5,21 +5,26 @@ var Q = (function() {
     var LOCAL_STORAGE_KEY = 'q';
 
     var defaults = {
+        'persist': false,
         'saveInterval': 5000,
         'discover': 0.0,
-        'alpha': 0.5,
+        'alpha': 0.2,
         'rewards': {
-            'alive': 1,
+            'alive': 0,
             'win': 10,
             'lose': -1000,
-            'cat': 1
+            'cat': 0
         }
     };
 
     function Q(opts) {
         opts = _.defaults(opts || {}, defaults);
         _.extend(this, opts);
-        this.matrix = {};
+
+        // all Qs should contribute to the same matrix
+        window.matrix = window.matrix || {};
+        this.matrix = window.matrix;
+
         this.stack = [];
         this.started = false;
         this.bindEvents();
@@ -29,13 +34,13 @@ var Q = (function() {
         start: function(game) {
             this.game = game;
             this.name = _localStorageKey(this.game.grid, this.game.streak);
-            this.sendLoop();
+            if (this.persist) this.sendLoop();
             this.started = true;
         },
 
         push: function(data) {
             this.stack.push(data);
-            console.log('Reward:', data);
+            // console.log('Reward:', data);
         },
 
         sendLoop: function() {
@@ -93,6 +98,20 @@ var Q = (function() {
             });
         },
 
+        calculateLearned: function() {
+            var totalStateActions = 0;
+            var totalLearnedActions = 0;
+            _.each(this.matrix, function(boards) {
+                _.each(boards, function(action) {
+                    totalStateActions += 1;
+                    if (action) {
+                        totalLearnedActions += 1;
+                    }
+                });
+            });
+            return totalLearnedActions / totalStateActions;
+        },
+
         choose: function(board, options) {
             var state = this.getState(board);
 
@@ -144,17 +163,22 @@ var Q = (function() {
             points = ((points * 10) | 0) / 10;
             lastState[this.lastAction] = points;
 
-            this.push({
-                'name': this.name,
-                'stateHash': this.lastBoard,
-                'actionHash': this.lastAction,
-                'val': points,
-                'reward': reward
-            });
+            if (this.persist) {
+                this.push({
+                    'name': this.name,
+                    'stateHash': this.lastBoard,
+                    'actionHash': this.lastAction,
+                    'val': points,
+                    'reward': reward
+                });
+            }
 
             if (result !== 'alive') {
                 this.lastBoard = this.lastAction = this.lastPts = 0;
                 $('.choices').empty();
+
+                var perc = ((this.calculateLearned() * 10000) | 0) / 100;
+                $('.learned').text('Trained: ' + perc + '%');
             }
         }
 

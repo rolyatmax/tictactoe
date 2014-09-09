@@ -14,6 +14,7 @@ var TicTacToe = (function() {
 
     function TicTacToe(opts) {
         opts = _.defaults(opts || {}, defaults);
+        this.totalGames = 0;
         _.extend(this, opts);
         this.$el = $(opts['el']);
         this.setup();
@@ -35,7 +36,9 @@ var TicTacToe = (function() {
             this.board = _createBoard(this.grid);
             this.currentPlayer = _.sample(this.players, 1)[0];
             this.playing = true;
-            this.nextTurn();
+            this.totalGames += 1;
+            this.$('.total').text('Total Games: ' + this.totalGames);
+            _.defer(this.nextTurn.bind(this));
         },
 
         setupBoard: function() {
@@ -208,8 +211,12 @@ var TicTacToe = (function() {
         },
 
         toggleComputer: function() {
-            this.players[1].trigger('toggle_computer');
-            this.nextTurn();
+            var playerTwo = this.players[1];
+            playerTwo.trigger('toggle_computer');
+            if (playerTwo.isComputer) {
+                var options = _getOptions(this.board, this.gravity);
+                playerTwo.onTurn(this.board, options);
+            }
         },
 
         stopPlay: function() {
