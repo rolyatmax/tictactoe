@@ -10,7 +10,7 @@ var Player = (function() {
         _.extend(this, opts);
 
         var prefix = this.isSmart ? 'smart' : 'p';
-        this.id = _.uniqueId(prefix);
+        this.id = this.id || _.uniqueId(prefix);
         if (this.isSmart) {
             this.isComputer = true;
             this.Q = new Q(opts);
