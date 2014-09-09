@@ -121,20 +121,6 @@ var Q = (function() {
             });
         },
 
-        calculateLearned: function() {
-            var totalStateActions = 0;
-            var totalLearnedActions = 0;
-            _.each(this.matrix, function(boards) {
-                _.each(boards, function(action) {
-                    totalStateActions += 1;
-                    if (action) {
-                        totalLearnedActions += 1;
-                    }
-                });
-            });
-            return totalLearnedActions / totalStateActions;
-        },
-
         choose: function(board, options) {
             var state = this.getState(board);
 
@@ -200,9 +186,6 @@ var Q = (function() {
             if (result !== 'alive') {
                 this.lastBoard = this.lastAction = this.lastPts = 0;
                 $('.choices').empty();
-
-                var perc = ((this.calculateLearned() * 10000) | 0) / 100;
-                $('.learned').text('Trained: ' + perc + '%');
             }
         }
     });
