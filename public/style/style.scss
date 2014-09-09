@@ -26,7 +26,14 @@ hr {
 }
 
 #game {
+    display: none;
     position: relative;
+}
+
+.training-choices {
+    position: absolute;
+    top: 150px;
+    left: 300px;
 }
 
 .squares {
@@ -73,7 +80,7 @@ hr {
     }
 }
 
-.persist, .toggle {
+.persist, .toggle, .training-choices>div {
     float: left;
     text-align: center;
     width: 160px;

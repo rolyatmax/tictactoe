@@ -9,6 +9,10 @@
 <body>
 	<div id="container">
 		<h1>Tic Tac Toe - Reinforcement Learning</h1>
+        <div class="training-choices">
+            <div class="local">Train Locally</div>
+            <div class="distributed">Train with Distributed Learning</div>
+        </div>
 		<div id="game">
             <div class="squares"></div>
             <div class="scores">
@@ -16,8 +20,7 @@
             </div>
             <div class="persisting-msg">Persisting With Server</div>
             <div class="buttons">
-                <div class="toggle">Toggle Computer</div>
-                <div class="persist">Use Distributed Learning</div>
+                <div class="toggle">Start/Stop Training</div>
             </div>
             <div class="choices"></div>
         </div>
@@ -32,20 +35,33 @@
 	<script src="js/TicTacToe.js"></script>
 	<script>
 		$(function() {
-            window.game = new TicTacToe({
-                'grid': 3,
-                'streak': 3,
-                'players': [
-                    new Player({
-                        'isSmart': true
-                    }),
-                    new Player({
-                        'isComputer': true,
-                        'isSmart': true,
-                        'discover': 0.5
-                    })
-                ]
-            });
+
+            $(document).on('click', '.local', startTraining.bind(null, 'local'))
+                       .on('click', '.distributed', startTraining.bind(null, 'distributed'));
+
+            function startTraining(method) {
+                $(document).off('click');
+                $('.training-choices').hide();
+                $('#game').show();
+                var persist = method === 'distributed';
+                $('.persisting-msg').toggleClass('show', persist);
+                window.game = new TicTacToe({
+                    'grid': 3,
+                    'streak': 3,
+                    'players': [
+                        new Player({
+                            'persist': persist,
+                            'isSmart': true
+                        }),
+                        new Player({
+                            'persist': persist,
+                            'isComputer': true,
+                            'isSmart': true,
+                            'discover': 0.5
+                        })
+                    ]
+                });
+            }
 		});
 	</script>
 </body>

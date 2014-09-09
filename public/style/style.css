@@ -21,7 +21,13 @@ hr {
   border-bottom: 1px solid #bbb; }
 
 #game {
+  display: none;
   position: relative; }
+
+.training-choices {
+  position: absolute;
+  top: 150px;
+  left: 300px; }
 
 .squares {
   -webkit-user-select: none;
@@ -59,7 +65,7 @@ hr {
   .persisting-msg.show {
     opacity: 1; }
 
-.persist, .toggle {
+.persist, .toggle, .training-choices > div {
   float: left;
   text-align: center;
   width: 160px;
@@ -70,7 +76,7 @@ hr {
   color: white;
   cursor: pointer;
   transition: all 200ms linear; }
-  .persist:hover, .toggle:hover {
+  .persist:hover, .toggle:hover, .training-choices > div:hover {
     background-color: #aaa; }
 
 .notification {
