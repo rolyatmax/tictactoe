@@ -84,11 +84,10 @@ var Player = (function() {
         onTurn: function(board, options) {
             var play = this.play.bind(this, board, options);
             play();
-            // setTimeout(play, this.delay || 0);
         },
 
         renderScore: function() {
-            this.$scorecard.text(this.id + ': ' + this.wins);
+            this.$scorecard.html(this.id + ': <span>' + this.wins + '</span>');
         },
 
         play: function(board, options) {

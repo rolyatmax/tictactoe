@@ -3,31 +3,46 @@
   box-sizing: border-box; }
 
 #container {
-  font-family: "Roboto", "Helvetica Neue", Helvetica, sans-serif;
+  position: relative;
+  font-family: "Raleway", "Helvetica Neue", Helvetica, sans-serif;
   color: #333;
-  width: 800px;
+  width: 650px;
   margin: 20px auto;
-  padding: 20px;
-  background-color: #efefef;
+  padding: 10px 0;
   border-radius: 5px; }
 
-h1 {
-  text-align: center;
-  letter-spacing: -0.5px;
-  font-size: 28px; }
+.title {
+  width: 291px;
+  position: absolute;
+  top: 415px;
+  right: 0;
+  text-align: right;
+  z-index: 10;
+  background: rgba(255, 255, 255, 0.5); }
 
-hr {
-  border: none;
-  border-bottom: 1px solid #bbb; }
+h1 {
+  margin-bottom: 5px;
+  letter-spacing: -1px;
+  font-size: 50px; }
+
+h3 {
+  font-size: 24px;
+  margin: 0 0 20px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #555; }
+
+h5 {
+  font-weight: 300;
+  font-size: 22px;
+  margin-top: 0; }
 
 #game {
   display: none;
   position: relative; }
 
 .training-choices {
-  position: absolute;
-  top: 150px;
-  left: 300px; }
+  margin: 100px auto;
+  width: 300px; }
 
 .squares {
   -webkit-user-select: none;
@@ -35,28 +50,41 @@ hr {
   width: 360px;
   margin: 20px auto;
   min-height: 360px;
-  border: 1px solid #aaa; }
+  position: absolute;
+  right: 0;
+  top: 0; }
 
 .square {
   -webkit-user-select: none;
-  border: 2px solid #aaa;
   float: left;
   text-align: center;
   color: #555;
-  text-transform: uppercase; }
+  text-transform: uppercase;
+  font-weight: 900; }
+  .square:nth-child(even), .square:nth-child(5) {
+    border: 2px solid #555; }
+  .square:nth-child(2), .square:nth-child(8) {
+    border-top: none;
+    border-bottom: none; }
+  .square:nth-child(4), .square:nth-child(6) {
+    border-right: none;
+    border-left: none; }
   .square.highlight {
-    border-color: red; }
+    background-color: rgba(255, 0, 0, 0.1); }
 
 .choices {
+  font-weight: 600;
   position: absolute;
-  top: 0; }
+  top: 385px; }
   .choices span {
-    display: block; }
+    display: block;
+    line-height: 1.4em;
+    cursor: default; }
 
 .buttons {
   position: absolute;
-  top: 385px;
-  left: 198px; }
+  top: 200px;
+  left: 0; }
 
 .persisting-msg {
   margin: 20px 0;
@@ -68,17 +96,30 @@ hr {
 .persist, .toggle, .training-choices > div {
   float: left;
   text-align: center;
-  width: 160px;
+  width: 300px;
   padding: 20px;
   border-radius: 3px;
-  background-color: #ccc;
+  background-color: #555;
   margin: 5px;
   color: white;
   cursor: pointer;
-  transition: all 200ms linear; }
+  transition: all 200ms linear;
+  font-weight: 600; }
   .persist:hover, .toggle:hover, .training-choices > div:hover {
-    background-color: #aaa; }
+    background-color: #3d3d3d; }
+
+.scores {
+  position: absolute;
+  top: 23px;
+  width: 180px; }
+  .scores span {
+    float: right; }
+
+.toggle {
+  margin: 0;
+  width: 150px; }
 
 .total {
   font-style: italic;
-  font-weight: bold; }
+  font-weight: bold;
+  margin-bottom: 10px; }

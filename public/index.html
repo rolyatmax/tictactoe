@@ -3,12 +3,17 @@
 <head>
 	<title>Tic Tac Toe</title>
 
-	<link href='https://fonts.googleapis.com/css?family=Roboto:400,300,700' rel='stylesheet' type='text/css'>
+	<link href='http://fonts.googleapis.com/css?family=Raleway:900,300,600' rel='stylesheet' type='text/css'>
 	<link rel="stylesheet" href="style/style.css">
 </head>
 <body>
 	<div id="container">
-		<h1>Tic Tac Toe - Reinforcement Learning</h1>
+        <div class="title">
+            <h1>Tic-Tac-Toe</h1>
+            <h3>Reinforcement Learning</h3>
+            <h5>Taylor Baldwin</h5>
+        </div>
+
         <div class="training-choices">
             <div class="local">Train Locally</div>
             <div class="distributed">Train with Distributed Learning</div>
@@ -16,7 +21,8 @@
 		<div id="game">
             <div class="squares"></div>
             <div class="scores">
-                <div class="total"></div>
+                <h3>Scores</h3>
+                <div class="total">Total Games: <span>0</span></div>
             </div>
             <div class="persisting-msg">Persisting With Server</div>
             <div class="buttons">

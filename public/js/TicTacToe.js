@@ -37,7 +37,7 @@ var TicTacToe = (function() {
             this.currentPlayer = _.sample(this.players, 1)[0];
             this.playing = true;
             this.totalGames += 1;
-            this.$('.total').text('Total Games: ' + this.totalGames);
+            this.$('.total span').text(this.totalGames);
             _.defer(this.nextTurn.bind(this));
         },
 
