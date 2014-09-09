@@ -2,13 +2,13 @@
 var qData = require('../q_data');
 
 /*
- * POST update to Q matrix
+ * GET/POST update to Q matrix
  */
 
 exports.q = function(req, res){
     var qs = req.body['qs'];
 
-    if (qs['reset']) {
+    if (qs && qs['reset']) {
         console.log('reloading qData!');
         return qData.reload(res);
     }
@@ -25,7 +25,3 @@ exports.q = function(req, res){
         q: qData.get()
     });
 };
-
-function _isNum(val) {
-    return typeof val === 'number';
-}

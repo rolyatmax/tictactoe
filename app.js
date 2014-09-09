@@ -25,6 +25,7 @@ if ('development' == app.get('env')) {
   app.use(express.errorHandler());
 }
 
+app.get('/q', routes.q);
 app.post('/q', routes.q);
 
 http.createServer(app).listen(app.get('port'), function(){

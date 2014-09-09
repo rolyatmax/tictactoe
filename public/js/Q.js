@@ -35,7 +35,7 @@ var Q = (function() {
         start: function(game) {
             this.game = game;
             this.name = _localStorageKey(this.game.grid, this.game.streak);
-            if (this.persist) this.sendLoop();
+            if (this.persist) this.startPersist();
             this.started = true;
         },
 
@@ -63,10 +63,12 @@ var Q = (function() {
                 contentType: 'application/json; charset=utf-8',
                 dataType: 'json',
                 type: 'POST'
-            }).then(function(res) {
-                this.matrix = res.q[this.name] || {};
-                console.log('Q received!', res);
-            }.bind(this));
+            }).then(this.onQReceived.bind(this));
+        },
+
+        onQReceived: function(res) {
+            this.matrix = res.q[this.name] || {};
+            console.log('Q received!', res);
         },
 
         bindEvents: function() {
@@ -76,14 +78,22 @@ var Q = (function() {
             this._eventsBound = true;
         },
 
-        onTogglePersist: function() {
-            this.persist = !this.persist;
-            if (this.persist) {
+        startPersist: function() {
+            $.getJSON('q', this.onQReceived.bind(this)).then(function() {
+                this.persist = true;
                 this.sendLoop();
+            }.bind(this));
+        },
+
+        onTogglePersist: function() {
+            var newPersist = !this.persist;
+            $('.persisting-msg').toggleClass('show', newPersist);
+            if (newPersist) {
+                this.startPersist();
             } else {
                 clearTimeout(this.timer);
+                this.persist = newPersist;
             }
-            $('.persisting-msg').toggleClass('show', this.persist);
         },
 
         setSymbol: function(symbol) {
