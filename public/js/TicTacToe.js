@@ -91,6 +91,7 @@ var TicTacToe = (function() {
             this.$el.on('click', '.toggle', this.toggleComputer.bind(this));
             this.$el.on('mouseover', '.choices span', this.onMouseoverChoice.bind(this));
             this.$el.on('mouseout', '.choices span', this.onMouseoutChoice.bind(this));
+            this.$el.on('click', '.persist', this.togglePersist.bind(this));
 
             _.each(this.players, function(player) {
                 var selectHandler = this.selectSquare.bind(this, player);
@@ -217,6 +218,12 @@ var TicTacToe = (function() {
                 var options = _getOptions(this.board, this.gravity);
                 playerTwo.onTurn(this.board, options);
             }
+        },
+
+        togglePersist: function() {
+            _.each(this.players, function(player) {
+                player.trigger('toggle_persist');
+            });
         },
 
         stopPlay: function() {

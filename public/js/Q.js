@@ -25,6 +25,7 @@ var Q = (function() {
         window.matrix = window.matrix || {};
         this.matrix = window.matrix;
 
+        this.timer = 0;
         this.stack = [];
         this.started = false;
         this.bindEvents();
@@ -44,12 +45,12 @@ var Q = (function() {
         },
 
         sendLoop: function() {
-            setTimeout(this.sendLoop.bind(this), 10000);
+            this.timer = setTimeout(this.sendLoop.bind(this), 10000);
             this.sendData();
         },
 
         sendData: function() {
-            if (this.started && !this.stack.length) {
+            if (!this.persist || (this.started && !this.stack.length)) {
                 return;
             }
 
@@ -71,7 +72,18 @@ var Q = (function() {
         bindEvents: function() {
             if (this._eventsBound) return;
             this.listenTo(this, 'reward_activity', this.evaluateLast);
+            this.listenTo(this, 'toggle_persist', this.onTogglePersist);
             this._eventsBound = true;
+        },
+
+        onTogglePersist: function() {
+            this.persist = !this.persist;
+            if (this.persist) {
+                this.sendLoop();
+            } else {
+                clearTimeout(this.timer);
+            }
+            $('.persisting-msg').toggleClass('show', this.persist);
         },
 
         setSymbol: function(symbol) {
@@ -181,7 +193,6 @@ var Q = (function() {
                 $('.learned').text('Trained: ' + perc + '%');
             }
         }
-
     });
 
     /////////// helpers

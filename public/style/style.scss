@@ -58,13 +58,29 @@ hr {
     }
 }
 
-.clear, .toggle {
+.buttons {
+    position: absolute;
+    top: 385px;
+    left: 198px;
+}
+
+.persisting-msg {
+    margin: 20px 0;
+    color: red;
+    opacity: 0;
+    &.show {
+        opacity: 1;
+    }
+}
+
+.persist, .toggle {
+    float: left;
     text-align: center;
     width: 160px;
     padding: 20px;
     border-radius: 3px;
     background-color: #ccc;
-    margin: 5px auto;
+    margin: 5px;
     color: white;
     cursor: pointer;
     transition: all 200ms linear;

@@ -46,12 +46,19 @@ var Player = (function() {
             this.listenTo(this, 'cat', this.onCatOrLose.bind(this, 'cat'));
             this.listenTo(this, 'you_won', this.onYouWon);
             this.listenTo(this, 'toggle_computer', this.onToggleComputer);
+            this.listenTo(this, 'toggle_persist', this.onTogglePersist);
 
             this._eventsBound = true;
         },
 
         onToggleComputer: function() {
             this.isComputer = !this.isComputer;
+        },
+
+        onTogglePersist: function() {
+            if (this.isSmart) {
+                this.Q.trigger('toggle_persist');
+            }
         },
 
         setSymbol: function() {
