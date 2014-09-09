@@ -44,6 +44,16 @@
                 $('.training-choices').hide();
                 $('#game').show();
                 var persist = method === 'distributed';
+                if (persist) {
+                    $.getJSON('q').then(function(res) {
+                        window.matrix = res.q['q_3_3'] || {}; // this will break if grid/streak changes
+                    }).then(startGame.bind(null, persist));
+                } else {
+                    startGame(persist);
+                }
+            }
+
+            function startGame(persist) {
                 $('.persisting-msg').toggleClass('show', persist);
                 window.game = new TicTacToe({
                     'grid': 3,
