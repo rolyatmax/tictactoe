@@ -8,7 +8,7 @@ var Q = (function() {
         'persist': false,
         'saveInterval': 5000,
         'discover': 0.0,
-        'alpha': 0.4,
+        'alpha': 0.2,
         'rewards': {
             'alive': 0,
             'win': 10,
