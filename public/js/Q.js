@@ -8,12 +8,13 @@ var Q = (function() {
         'persist': false,
         'saveInterval': 5000,
         'discover': 0.0,
-        'alpha': 0.2,
+        'alpha': 0.5,
+        'discount': 0.2,
         'rewards': {
-            'alive': 0,
+            'alive': 1,
             'win': 10,
             'lose': -1000,
-            'cat': 0
+            'cat': 1
         }
     };
 
@@ -154,7 +155,7 @@ var Q = (function() {
             var action = chooseRandom ? options[_.random(0, options.length - 1)] : max;
 
             this.lastPts = action['points'];
-            this.trigger('reward_activity', 'alive');
+            this.trigger('reward_activity', 'alive', board);
 
             var hash = this.mutations ? this.mutations['hash'] : _hashBoard(board, this.symbol);
             this.lastBoard = hash;
@@ -171,7 +172,7 @@ var Q = (function() {
             return _hashSquareObj(choice);
         },
 
-        evaluateLast: function(result) {
+        evaluateLast: function(result, board) {
             if (!this.lastBoard || !this.lastAction) return;
 
             var reward = this.rewards[result];
@@ -180,9 +181,10 @@ var Q = (function() {
                 return;
             }
             var lastStateActionVal = lastState[this.lastAction];
-            var lastPts = this.lastPts || 0;
-            var points = lastStateActionVal + this.alpha * (reward + lastPts - lastStateActionVal);
-            points = ((points * 10) | 0) / 10;
+            var state = board && this.getState(board);
+            var curBestChoice = state ? _.max(state) || 0 : 0;
+            var points = lastStateActionVal + this.alpha * (reward + (this.discount * curBestChoice) - lastStateActionVal);
+            points = ((points * 1000) | 0) / 1000;
             lastState[this.lastAction] = points;
 
             if (this.persist) {

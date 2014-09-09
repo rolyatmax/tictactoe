@@ -42,9 +42,9 @@ var Player = (function() {
             if (this._eventsBound) return;
 
             this.listenTo(this, 'your_turn', this.onTurn);
-            this.listenTo(this, 'you_lose', this.onCatOrLose.bind(this, 'lose'));
-            this.listenTo(this, 'cat', this.onCatOrLose.bind(this, 'cat'));
-            this.listenTo(this, 'you_won', this.onYouWon);
+            this.listenTo(this, 'you_lose', this.onGameOver.bind(this, 'lose'));
+            this.listenTo(this, 'cat', this.onGameOver.bind(this, 'cat'));
+            this.listenTo(this, 'you_won', this.onGameOver.bind(this, 'win'));
             this.listenTo(this, 'toggle_computer', this.onToggleComputer);
             this.listenTo(this, 'toggle_persist', this.onTogglePersist);
 
@@ -69,22 +69,16 @@ var Player = (function() {
             }
         },
 
-        onCatOrLose: function(reward) {
+        onGameOver: function(reward) {
             if (this.isSmart) {
                 this.Q.trigger('reward_activity', reward);
             }
 
             this.total += 1;
-        },
-
-        onYouWon: function() {
-            if (this.isSmart) {
-                this.Q.trigger('reward_activity', 'win');
+            if (reward === 'win') {
+                this.wins += 1;
+                this.renderScore();
             }
-
-            this.wins += 1;
-            this.total += 1;
-            this.renderScore();
         },
 
         onTurn: function(board, options) {
