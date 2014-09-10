@@ -20,17 +20,20 @@
                 <div class="local">Train Locally</div>
                 <div class="distributed">Train with Distributed Learning</div>
             </div>
-    		<div id="game">
+            <div id="game">
                 <div class="squares"></div>
                 <div class="scores">
                     <h3>Scores</h3>
                     <div class="total">Total Games: <span>0</span></div>
                 </div>
-                <div class="persisting-msg">Persisting With Server</div>
                 <div class="buttons">
                     <div class="toggle">Start/Stop Training</div>
                 </div>
-                <div class="choices"></div>
+                <div class="choices for-playing"></div>
+                <div class="msg">
+                    <div class="for-training">Training&hellip;</div>
+                    <div class="for-playing">Click the board to play against the algorithm</div>
+                </div>
             </div>
     	</div>
     </div>
@@ -59,7 +62,7 @@
 
             function startTraining(method) {
                 $(document).off('click');
-                $('.training-choices').hide();
+                $('.training-choices').remove();
                 $('#game').show();
                 var persist = method === 'distributed';
                 if (persist) {
@@ -72,7 +75,6 @@
             }
 
             function startGame(persist) {
-                $('.persisting-msg').toggleClass('show', persist);
                 window.game = new TicTacToe({
                     'grid': 3,
                     'streak': 3,

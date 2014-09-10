@@ -75,7 +75,6 @@ var Q = (function() {
         bindEvents: function() {
             if (this._eventsBound) return;
             this.listenTo(this, 'reward_activity', this.evaluateLast);
-            this.listenTo(this, 'toggle_persist', this.onTogglePersist);
             this._eventsBound = true;
         },
 
@@ -84,17 +83,6 @@ var Q = (function() {
                 this.persist = true;
                 this.sendLoop();
             }.bind(this));
-        },
-
-        onTogglePersist: function() {
-            var newPersist = !this.persist;
-            $('.persisting-msg').toggleClass('show', newPersist);
-            if (newPersist) {
-                this.startPersist();
-            } else {
-                clearTimeout(this.timer);
-                this.persist = newPersist;
-            }
         },
 
         setSymbol: function(symbol) {
@@ -115,8 +103,14 @@ var Q = (function() {
                 return -choice.points;
             });
             _.each(choices, function(choice) {
-                var text = choice.coords + ': ' + choice.points;
-                var $choice = $('<span>').attr('data-uid', choice.coords).text(text);
+                var html = '<span>' + choice.coords + ':</span>' + choice.points;
+
+                var $choice = $('<span>').attr({
+                    'data-uid': choice.coords,
+                    'class': 'choice'
+                });
+
+                $choice.html(html);
                 $choices.append($choice);
             });
         },

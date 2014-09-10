@@ -79,6 +79,8 @@ var TicTacToe = (function() {
                     'game': this
                 });
             }.bind(this));
+            this.training = _.all(this.players, function(player) { return player.isComputer; });
+            this.toggleMessages();
             this.nextTurn();
         },
 
@@ -91,7 +93,6 @@ var TicTacToe = (function() {
             this.$el.on('click', '.toggle', this.toggleComputer.bind(this));
             this.$el.on('mouseover', '.choices span', this.onMouseoverChoice.bind(this));
             this.$el.on('mouseout', '.choices span', this.onMouseoutChoice.bind(this));
-            this.$el.on('click', '.persist', this.togglePersist.bind(this));
 
             _.each(this.players, function(player) {
                 var selectHandler = this.selectSquare.bind(this, player);
@@ -202,32 +203,20 @@ var TicTacToe = (function() {
             });
         },
 
-        togglePlay: function() {
-            if (this.playing) {
-                this.stopPlay();
-            } else {
-                this.playing = true;
-                this.nextTurn();
-            }
+        toggleMessages: function() {
+            $('.for-playing').toggleClass('show', !this.training);
+            $('.for-training').toggleClass('show', this.training);
         },
 
         toggleComputer: function() {
+            this.training = !this.training;
+            this.toggleMessages();
             var playerTwo = this.players[1];
             playerTwo.trigger('toggle_computer');
             if (playerTwo.isComputer) {
                 var options = _getOptions(this.board, this.gravity);
                 playerTwo.onTurn(this.board, options);
             }
-        },
-
-        togglePersist: function() {
-            _.each(this.players, function(player) {
-                player.trigger('toggle_persist');
-            });
-        },
-
-        stopPlay: function() {
-            this.playing = false;
         },
 
         $: function(selector) {

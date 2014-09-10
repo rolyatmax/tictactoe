@@ -21,7 +21,7 @@ body {
 .title {
     width: 291px;
     position: absolute;
-    top: 415px;
+    top: 390px;
     right: 0;
     text-align: right;
     z-index: 10;
@@ -95,10 +95,16 @@ h5 {
     font-weight: 600;
     position: absolute;
     top: 385px;
-    span {
-        display: block;
-        line-height: 1.4em;
+    width: 280px;
+    .choice {
+        display: inline-block;
         cursor: default;
+        width: 48%;
+        margin: 2px 1%;
+        float: left;
+        span {
+            padding-right: 8px;
+        }
     }
 }
 
@@ -108,20 +114,11 @@ h5 {
     left: 0;
 }
 
-.persisting-msg {
-    margin: 20px 0;
-    color: red;
-    opacity: 0;
-    &.show {
-        opacity: 1;
-    }
-}
-
 .persist, .toggle, .training-choices>div {
     float: left;
     text-align: center;
     width: 300px;
-    padding: 20px;
+    padding: 20px 0;
     border-radius: 3px;
     background-color: #555;
     margin: 5px;
@@ -138,6 +135,9 @@ h5 {
     position: absolute;
     top: 23px;
     width: 180px;
+    h3 {
+        font-size: 32px;
+    }
     span {
         float: right;
     }
@@ -145,13 +145,43 @@ h5 {
 
 .toggle {
     margin: 0;
-    width: 150px;
+    width: 183px;
 }
 
 .total {
     font-style: italic;
     font-weight: bold;
     margin-bottom: 10px;
+}
+
+.msg {
+    font-size: 24px;
+    .for-playing {
+        width: 185px;
+        position: absolute;
+        left: 0;
+        top: 285px;
+        font-size: 20px;
+    }
+    .for-training {
+        position: absolute;
+        top: 168px;
+        right: 85px;
+        background: rgba(#555, 0.9);
+        padding: 20px 35px;
+        font-weight: 900;
+        color: white;
+    }
+}
+
+.for-playing, .for-training {
+    opacity: 0;
+    -webkit-transition: opacity 150ms linear;
+    pointer-events: none;
+    &.show {
+        opacity: 1;
+        pointer-events: auto;
+    }
 }
 
 .info_btn, .info_container {
