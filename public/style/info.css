@@ -21,6 +21,7 @@
 	line-height: 1.5em;
 	letter-spacing: 0;
 	font-size: 0.95em;
+	box-sizing: content-box;
 }
 
 .info_container.open {
@@ -88,11 +89,11 @@
 	color: #ddd;
 	cursor: pointer;
 	padding: 18px 24px;
-	box-shadow: 1px 0 1px rgba(255,255,255,0.15);
 	letter-spacing: 2em;
 	width: 0.3em;
 	overflow: hidden;
 	text-align: left;
+	box-sizing: content-box;
 }
 
 .info_btn:hover {

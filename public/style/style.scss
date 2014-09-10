@@ -6,12 +6,12 @@
 
 body {
     margin: 0;
+    font-family: "Raleway", "Helvetica Neue", Helvetica, sans-serif;
+    color: #333;
 }
 
 #container {
     position: relative;
-	font-family: "Raleway", "Helvetica Neue", Helvetica, sans-serif;
-	color: #333;
 	width: 650px;
 	margin: 0 auto;
 	padding: 10px 0;
@@ -152,4 +152,9 @@ h5 {
     font-style: italic;
     font-weight: bold;
     margin-bottom: 10px;
+}
+
+.info_btn, .info_container {
+    font-weight: 600;
+    background-color: #333;
 }
