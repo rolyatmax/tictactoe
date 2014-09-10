@@ -1,0 +1,103 @@
+
+.info_container h1 {
+	text-align: center;
+	margin-top: 0;
+}
+
+.info_container {
+	text-align: left;
+	padding: 30px 50px;
+	width: 400px;
+	min-height: 100%;
+	position: absolute;
+	top: 0;
+	left: -500px;
+	background-color: rgb(27,34,32);
+	-webkit-transition: left .5s cubic-bezier(0.23, 1, 0.32, 1);
+	   -moz-transition: left .5s cubic-bezier(0.23, 1, 0.32, 1);
+	        transition: left .5s cubic-bezier(0.23, 1, 0.32, 1);
+	color: #eee;
+	font-weight: 300;
+	line-height: 1.5em;
+	letter-spacing: 0;
+	font-size: 0.95em;
+}
+
+.info_container.open {
+	left: 0;
+}
+
+.info_container a {
+	color: #eee;
+}
+
+.content_wrapper {
+	position: relative;
+	left: 0;
+	-webkit-transition: left .5s cubic-bezier(0.23, 1, 0.32, 1);
+	   -moz-transition: left .5s cubic-bezier(0.23, 1, 0.32, 1);
+	        transition: left .5s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.content_wrapper.inactive {
+	left: 500px;
+}
+
+@-webkit-keyframes info-anim {
+	0% { -webkit-transform: rotateY(120deg); }
+	100% { -webkit-transform: rotateY(0deg); }
+}
+/*@-moz-keyframes info-anim {
+    0% { -moz-transform: rotateY(120deg); }
+    100% { -moz-transform: rotateY(0deg); }
+}*/
+@keyframes info-anim {
+    0% { transform: rotateY(120deg); }
+    100% { transform: rotateY(0deg); }
+}
+
+.info_btn {
+
+	-webkit-transition: all .5s cubic-bezier(0.23, 1, 0.32, 1);
+	   -moz-transition: all .5s cubic-bezier(0.23, 1, 0.32, 1);
+	        transition: all .5s cubic-bezier(0.23, 1, 0.32, 1);
+
+	-webkit-transform-style: preserve-3d;
+	   /*-moz-transform-style: preserve-3d;*/
+	        transform-style: preserve-3d;
+
+	-webkit-transform-origin: 0% 50%;
+	   /*-moz-transform-origin: 0% 50%;*/
+	        transform-origin: 0% 50%;
+
+	-webkit-transform: rotateY(120deg);
+	   /*-moz-transform: rotateY(120deg);*/
+	        transform: rotateY(120deg);
+
+	-webkit-animation: info-anim 1s cubic-bezier(0.23, 1, 0.32, 1) 0.5s 1 normal forwards;
+	   /*-moz-animation: info-anim 1s cubic-bezier(0.23, 1, 0.32, 1) 0.5s 1 normal forwards;*/
+	        animation: info-anim 1s cubic-bezier(0.23, 1, 0.32, 1) 0.5s 1 normal forwards;
+
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: 100;
+	display: inline-block;
+	margin-right: 10px;
+	background-color: rgb(27,34,32);
+	color: #ddd;
+	cursor: pointer;
+	padding: 18px 24px;
+	box-shadow: 1px 0 1px rgba(255,255,255,0.15);
+	letter-spacing: 2em;
+	width: 0.3em;
+	overflow: hidden;
+	text-align: left;
+}
+
+.info_btn:hover {
+	color: #fff;
+	box-shadow: none;
+	letter-spacing: 0;
+	width: 1.6em;
+}

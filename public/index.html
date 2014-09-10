@@ -4,33 +4,37 @@
 	<title>Tic Tac Toe</title>
 
 	<link href='http://fonts.googleapis.com/css?family=Raleway:900,300,600' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="style/info.css">
 	<link rel="stylesheet" href="style/style.css">
 </head>
 <body>
-	<div id="container">
-        <div class="title">
-            <h1>Tic-Tac-Toe</h1>
-            <h3>Reinforcement Learning</h3>
-            <h5>Taylor Baldwin</h5>
-        </div>
+    <div id="wrapper">
+    	<div id="container">
+            <div class="title">
+                <h1>Tic-Tac-Toe</h1>
+                <h3>Reinforcement Learning</h3>
+                <h5>Taylor Baldwin</h5>
+            </div>
 
-        <div class="training-choices">
-            <div class="local">Train Locally</div>
-            <div class="distributed">Train with Distributed Learning</div>
-        </div>
-		<div id="game">
-            <div class="squares"></div>
-            <div class="scores">
-                <h3>Scores</h3>
-                <div class="total">Total Games: <span>0</span></div>
+            <div class="training-choices">
+                <div class="local">Train Locally</div>
+                <div class="distributed">Train with Distributed Learning</div>
             </div>
-            <div class="persisting-msg">Persisting With Server</div>
-            <div class="buttons">
-                <div class="toggle">Start/Stop Training</div>
+    		<div id="game">
+                <div class="squares"></div>
+                <div class="scores">
+                    <h3>Scores</h3>
+                    <div class="total">Total Games: <span>0</span></div>
+                </div>
+                <div class="persisting-msg">Persisting With Server</div>
+                <div class="buttons">
+                    <div class="toggle">Start/Stop Training</div>
+                </div>
+                <div class="choices"></div>
             </div>
-            <div class="choices"></div>
-        </div>
-	</div>
+    	</div>
+    </div>
+    <script src="js/info.js"></script>
 	<script src="bower_components/jquery/dist/jquery.min.js"></script>
 	<script src="bower_components/lodash/dist/lodash.min.js"></script>
 	<script src="bower_components/backbone/backbone.js"></script>
@@ -39,9 +43,17 @@
     <script src="js/Player.js"></script>
 	<script src="js/Square.js"></script>
 	<script src="js/TicTacToe.js"></script>
+    <script>
+        var opts = {
+            text: "PUT STUFF HERE",
+            keyTrigger: true,
+            container: 'wrapper'
+        };
+
+        var info = new Info(opts);
+    </script>
 	<script>
 		$(function() {
-
             $(document).on('click', '.local', startTraining.bind(null, 'local'))
                        .on('click', '.distributed', startTraining.bind(null, 'distributed'));
 

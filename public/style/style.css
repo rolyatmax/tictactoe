@@ -2,12 +2,15 @@
   -webkit-font-smoothing: antialiased;
   box-sizing: border-box; }
 
+body {
+  margin: 0; }
+
 #container {
   position: relative;
   font-family: "Raleway", "Helvetica Neue", Helvetica, sans-serif;
   color: #333;
   width: 650px;
-  margin: 20px auto;
+  margin: 0 auto;
   padding: 10px 0;
   border-radius: 5px; }
 
