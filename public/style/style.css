@@ -155,3 +155,6 @@ h5 {
 .info_btn, .info_container {
   font-weight: 600;
   background-color: #333; }
+
+#info h3 {
+  font-size: 20px; }
