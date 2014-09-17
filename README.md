@@ -13,7 +13,7 @@ You can pause the training and play against the "Smart" version at any time. Aft
 
 There were some interesting optimizations I made which seemed to have helped speed up learning quite a bit. The most important optimization was probably the work I did normalizing equivalent board states. For (almost) every possible tic-tac-toe board, there are at least a few other tic-tac-toe boards that are essentially equivalent. For example, you can take a given board and rotate three times or flip it along the vertical and/or horizontal axes. Making sure these board states were considered equivalent cut down on the amount of memory required to store the policy and, consequently, the amount of time to learn the policy.
 
-Check out the code at [github.com/rolyatmax/tictactoe](https://github.com/rolyatmax/tictactoe). It's a bit messy in parts (as it has changed tremendously over time), but the meat of the learning algorithm is in `public/js/Q.js`.
+Check out the code at [github.com/rolyatmax/tictactoe](https://github.com/rolyatmax/tictactoe). It's a bit messy in parts (as it has changed tremendously over time), but the meat of the learning algorithm is in `public/js/Q.js`. For more info about how Q-Learning works, check out the [Wikipedia article](http://en.wikipedia.org/wiki/Q-learning).
 
 
 To run on your own:
