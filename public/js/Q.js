@@ -8,7 +8,8 @@ var Q = (function() {
         'persist': false,
         'saveInterval': 5000,
         'discover': 0.0,
-        'alpha': 0.5,
+        'alpha': 1.0,
+        'decay': 0.99996,
         'discount': 0.2,
         'rewards': {
             'alive': 1,
@@ -36,7 +37,11 @@ var Q = (function() {
         start: function(game) {
             this.game = game;
             this.name = _localStorageKey(this.game.grid, this.game.streak);
-            if (this.persist) this.startPersist();
+            if (this.persist) {
+                this.alpha = 0.3;
+                this.decay = 1;
+                this.startPersist();
+            }
             this.started = true;
         },
 
@@ -134,7 +139,6 @@ var Q = (function() {
             var chooseRandom = (min['points'] === max['points'] || Math.random() < this.discover);
             var action = chooseRandom ? options[_.random(0, options.length - 1)] : max;
 
-            this.lastPts = action['points'];
             this.trigger('reward_activity', 'alive', board);
 
             var hash = this.mutations ? this.mutations['hash'] : _hashBoard(board, this.symbol);
@@ -163,7 +167,7 @@ var Q = (function() {
             var lastStateActionVal = lastState[this.lastAction];
             var state = board && this.getState(board);
             var curBestChoice = state ? _.max(state) || 0 : 0;
-            var points = lastStateActionVal + this.alpha * (reward + (this.discount * curBestChoice) - lastStateActionVal);
+            var points = (1 - this.discount) * lastStateActionVal + this.alpha * (reward + this.discount * curBestChoice);
             points = ((points * 1000) | 0) / 1000;
             lastState[this.lastAction] = points;
 
@@ -178,9 +182,13 @@ var Q = (function() {
             }
 
             if (result !== 'alive') {
-                this.lastBoard = this.lastAction = this.lastPts = 0;
+                this.lastBoard = this.lastAction = 0;
                 $('.choices').empty();
             }
+
+            this.alpha *= this.decay;
+            console.log(this.alpha);
+            if (this.alpha < 0.000001) alert('Done training!');
         }
     });
 
