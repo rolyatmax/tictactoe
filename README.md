@@ -13,13 +13,13 @@ For the "distributed learning" mode, The learner pushes all policy updates onto 
 
 As you might have guessed, there is some clobbering that takes place on the canonical policy. However, one might be able to avoid clobbering completely by only passing to the server a state, an action, and a reward. This lets the server run its own evaluation function instead of relying on clients' states. This would also require the constants in the evaluation function to match on the client and the server.
 
-The algorithm trains by playing against a version of itself. The "Smart" version (listed under the "Scores" section) always selects a move its trained policy recommends. The "Kinda Smart" version (a bit of a misnomer) will occasionally select random moves to see the outcome. It is this "exploration" that actually allows the algorithm to learn. Because you can play a tic-tac-toe game perfectly and not win, the best measure of a policy's efficacy is how many wins it has given up to its opponent. Because the "Kinda Smart" version makes random moves for some percentage of its total plays, it happens to give up quite a few wins to its opponent.
+The algorithm trains by playing against a version of itself. The "Smart" version (listed under the "Scores" section) always selects a move its trained policy recommends. The "Kinda Smart" version (a bit of a misnomer) will occasionally select random moves to learn from the outcome. It is this "exploration" that actually allows the algorithm to discover better policies. Because you can play a tic-tac-toe game perfectly and not win, the best measure of a policy's efficacy is how many wins it has given up to its opponent. Because the "Kinda Smart" version makes random moves for some percentage of its total plays, it happens to give up quite a few wins to its opponent even though it shares the exact same q-matrix with the "Smart" version.
 
-You can pause the training and play against the "Smart" version at any time. After the algorithm moves, it displays its options in the bottom corner of the screen. You can mouse over these options to see which ones were most favored.
+You can pause the training and play against the "Smart" version at any time. After the algorithm moves, it displays its options in the bottom corner of the screen. You can mouse over these options to see the relative favorability of each move.
 
-There were some interesting optimizations I made which seemed to have helped speed up learning quite a bit. The most important optimization was probably the work I did normalizing equivalent board states. For (almost) every possible tic-tac-toe board, there are at least a few other tic-tac-toe boards that are essentially equivalent. For example, you can take a given board and rotate three times or flip it along the vertical and/or horizontal axes. Making sure these board states were considered equivalent cut down on the amount of memory required to store the policy and, consequently, the amount of time to learn the policy.
+There were some interesting optimizations I made which seemed to have helped speed up learning quite a bit. The most important optimization was probably the work I did normalizing equivalent board states. For (almost) every possible tic-tac-toe board, there are at least a few other tic-tac-toe boards that are essentially equivalent. You can take a given board and rotate three times or flip it along the vertical and/or horizontal axes.
 
-To accomplish the normalization, the choosing function turns the board state into a string:
+For example, this board
 
      X | O |
     -----------
@@ -27,7 +27,7 @@ To accomplish the normalization, the choosing function turns the board state int
     -----------
        |   | O
 
-would become `AB--A---B` if you are Xs and `BA--B---A` if you are Os. It then checks the matrix for any equivalent permutations by rotating and flipping the board. The following board states are equivalent to the board above, for example.
+is, for our purposes, the same as
 
        |   | O              O |   |
     -----------            -----------
@@ -35,7 +35,20 @@ would become `AB--A---B` if you are Xs and `BA--B---A` if you are Os. It then ch
     -----------            -----------
      X |   |                  |   | X
 
- If it finds a permutation, it remembers how many rotations and flips it used so that it can apply the same transformations to the move it selects - "translating", so to speak, the moves between the actual board and the permutation.
+
+Making sure these board states were considered equivalent cut down on the amount of memory required to store the policy and, consequently, the amount of time required to generate an effective policy.
+
+To accomplish the normalization, the choosing function turns the board state into a string. The string representation of this board (from the *X*'s point of view):
+
+     X | O |
+    -----------
+       | X |
+    -----------
+       |   | O
+
+is `AB--A---B`. (*A*s represent a player's own symbol while *B*s represent the opponent's. From the *O*'s point of view, the board would be represented as `BA--B---A`.) It then checks the matrix for any equivalent permutations by rotating and flipping the board. The following board states are equivalent to the board above, for example.
+
+If it finds a permutation, it remembers how many rotations and flips it used so that it can apply the same transformations to the move it selects - "translating", so to speak, the moves between the actual board and the permutation.
 
 See it in action at [tbaldw.in/tictactoe](https://tbaldw.in/tictactoe). Check out the code at [github.com/rolyatmax/tictactoe](https://github.com/rolyatmax/tictactoe). It's a bit messy in parts (as it has changed tremendously over time), but the meat of the learning algorithm is in `public/js/Q.js`. For more info about how Q-Learning works, check out the [Wikipedia article](http://en.wikipedia.org/wiki/Q-learning).
 
