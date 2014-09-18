@@ -156,8 +156,9 @@ h5 {
   font-weight: 600;
   background-color: #333; }
 
-#info h3 {
-  font-size: 26px; }
+#info h1 {
+  font-size: 30px;
+  line-height: 1.2em; }
 #info p {
   font-size: 18px;
   line-height: 1.6em;

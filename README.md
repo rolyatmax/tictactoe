@@ -21,15 +21,21 @@ There were some interesting optimizations I made which seemed to have helped spe
 
 To accomplish the normalization, the choosing function turns the board state into a string:
 
-```
- X | O |                        |   | O                      O |   |
------------                  -----------                    -----------
-   | X |     is the same as   O | X |      is the same as      | X | O
------------                  -----------                    -----------
-   |   | O                    X |   |                          |   | X
-```
+     X | O |
+    -----------
+       | X |
+    -----------
+       |   | O
 
-would become `AB--A---B` if you are Xs and `BA--B---A` if you are Os. It then checks the matrix for any equivalent permutations by rotating and flipping the board. If it finds one, it remembers how many rotations and flips it used so that it can apply the same transformations to the move it selects - "translating", so to speak, the moves between the actual board and the permutation.
+would become `AB--A---B` if you are Xs and `BA--B---A` if you are Os. It then checks the matrix for any equivalent permutations by rotating and flipping the board. The following board states are equivalent to the board above, for example.
+
+       |   | O              O |   |
+    -----------            -----------
+     O | X |        and       | X | O
+    -----------            -----------
+     X |   |                  |   | X
+
+ If it finds a permutation, it remembers how many rotations and flips it used so that it can apply the same transformations to the move it selects - "translating", so to speak, the moves between the actual board and the permutation.
 
 See it in action at [tbaldw.in/tictactoe](https://tbaldw.in/tictactoe). Check out the code at [github.com/rolyatmax/tictactoe](https://github.com/rolyatmax/tictactoe). It's a bit messy in parts (as it has changed tremendously over time), but the meat of the learning algorithm is in `public/js/Q.js`. For more info about how Q-Learning works, check out the [Wikipedia article](http://en.wikipedia.org/wiki/Q-learning).
 
