@@ -14,9 +14,10 @@
     "url": "git@github.com:rolyatmax/tictactoe.git"
   },
   "dependencies": {
+    "bower": "1.4.1",
     "express": "3.4.8",
-    "lodash": "*",
-    "node-sass": "0.8.1",
-    "bower": "*"
+    "forever": "0.14.1",
+    "lodash": "3.9.3",
+    "node-sass": "0.8.1"
   }
 }
