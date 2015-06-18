@@ -54,6 +54,12 @@ var qData = {
             return;
         }
 
+        if (!this.data) {
+            cb();
+            this.updated = false;
+            return;
+        }
+
         fn = fn || filename;
         fs.writeFile(fn, JSON.stringify(this.data), function(err) {
             if (err) throw err;
@@ -77,9 +83,7 @@ var qData = {
     startBackup: function() {
         doBackup();
         return this;
-    },
-
-
+    }
 };
 
 var timeout;

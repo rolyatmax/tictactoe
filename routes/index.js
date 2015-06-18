@@ -1,9 +1,4 @@
-
 var qData = require('../q_data');
-
-/*
- * GET/POST update to Q matrix
- */
 
 exports.q = function(req, res){
     var qs = req.body['qs'];
