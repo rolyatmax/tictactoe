@@ -58,6 +58,7 @@ var qData = {
         }
 
         fn = fn || filename;
+        winston.info('Writing to ', fn);
         touch.sync(fn);
         fs.writeFile(fn, JSON.stringify(this.data), {flag: 'wx'}, function(err) {
             winston.err('Writefile error', err);
