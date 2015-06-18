@@ -187,7 +187,7 @@ var Q = (function() {
             }
 
             this.alpha *= this.decay;
-            console.log(this.alpha);
+            // console.log(this.alpha);
             if (this.alpha < 0.000001) alert('Done training!');
         }
     });
