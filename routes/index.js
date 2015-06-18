@@ -1,10 +1,11 @@
+var winston = require('winston');
 var qData = require('../q_data');
 
 exports.q = function(req, res){
     var qs = req.body['qs'];
 
     if (qs && qs['reset']) {
-        console.log('reloading qData!');
+        winston.info('reloading qData!');
         return qData.reload(res);
     }
 
@@ -13,7 +14,7 @@ exports.q = function(req, res){
         while (len--) {
             qData.save(qs[len]);
         }
-        console.log('qData saved!', qs.length);
+        winston.info('qData saved!', qs.length);
     }
 
     res.send({

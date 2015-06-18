@@ -1,9 +1,6 @@
-
 var fs = require('fs');
-
-/*
- * Q Data
- */
+var winston = require('winston');
+var touch = require('touch');
 
 var filename = 'data';
 
@@ -12,7 +9,7 @@ var qData = {
         var data = this.read();
         if (data) {
             this.data = data;
-            console.log('Loading from backup!', data);
+            winston.info('Loading from backup!', data);
             return this.startBackup();
         }
 
@@ -22,9 +19,9 @@ var qData = {
 
     reload: function(res) {
         var fn = filename + '_' + Date.now();
-        console.log('saved data at:', fn);
+        winston.info('saved data at:', fn);
         this.backup(fn, function() {
-            console.log('deleting:', filename);
+            winston.info('deleting:', filename);
             fs.unlink(filename, function() {
                 this.init();
                 res.send({success: true});
@@ -61,23 +58,18 @@ var qData = {
         }
 
         fn = fn || filename;
-        fs.writeFile(fn, JSON.stringify(this.data), function(err) {
+        fs.writeFile(fn, JSON.stringify(this.data), {flag: 'wx'}, function(err) {
             if (err) throw err;
             if (cb) cb();
-            console.log('Backup created', new Date());
+            winston.info('Backup created', new Date());
             this.updated = false;
         }.bind(this));
     },
 
     read: function() {
-        try {
-            var data = fs.readFileSync(filename, {encoding: 'utf8'});
-            return JSON.parse(data);
-        } catch (e) {
-            fs.writeFile(filename);
-            console.warn('error reading file:', e);
-            return false;
-        }
+        touch.sync(filename);
+        var data = fs.readFileSync(filename, {encoding: 'utf8'});
+        return !!data && JSON.parse(data);
     },
 
     startBackup: function() {

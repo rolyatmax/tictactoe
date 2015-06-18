@@ -1,9 +1,9 @@
-
 var express = require('express');
 var routes = require('./routes');
 var sass = require('node-sass');
 var http = require('http');
 var path = require('path');
+var winston = require('winston');
 
 var app = express();
 
@@ -29,5 +29,5 @@ app.get('/q', routes.q);
 app.post('/q', routes.q);
 
 http.createServer(app).listen(app.get('port'), function(){
-  console.log('Express server listening on port ' + app.get('port'));
+  winston.info('Express server listening on port ' + app.get('port'));
 });
