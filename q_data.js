@@ -61,7 +61,7 @@ var qData = {
         winston.info('Writing to ', fn);
         touch.sync(fn);
         fs.writeFile(fn, JSON.stringify(this.data), {flag: 'wx'}, function(err) {
-            winston.error('Writefile error', err);
+            if (err) winston.error('Writefile error', err);
             if (cb) cb();
             winston.info('Backup created', new Date());
             this.updated = false;
