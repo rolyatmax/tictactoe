@@ -7,7 +7,7 @@
   ],
   "private": true,
   "scripts": {
-    "start": "node app.js"
+    "start": "node tictactoe.js"
   },
   "repository": {
     "type": "git",
@@ -15,10 +15,10 @@
   },
   "dependencies": {
     "bower": "1.4.1",
-    "express": "3.4.8",
-    "forever": "0.14.1",
+    "express": "4.13.3",
+    "forever": "0.15.1",
     "lodash": "3.9.3",
-    "node-sass": "0.8.1",
+    "node-sass": "3.4.2",
     "touch": "0.0.3",
     "winston": "1.0.0"
   }
