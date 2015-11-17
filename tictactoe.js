@@ -1,28 +1,31 @@
 var express = require('express');
 var routes = require('./routes');
-var sass = require('node-sass');
 var http = require('http');
 var path = require('path');
 var winston = require('winston');
+var morgan = require('morgan');
+var bodyParser = require('body-parser');
+var errorhandler = require('errorhandler');
+var serveStatic = require('serve-static');
+var sassMiddleware = require('node-sass-middleware');
 
 var app = express();
 
 // all environments
 app.set('port', process.env.PORT || 8080);
-app.use(express.logger('dev'));
-app.use(express.json());
-app.use(express.urlencoded());
-app.use(app.router);
-app.use(sass.middleware({
-	src: path.join(__dirname, 'public'),
-	dest: path.join(__dirname, 'public'),
-	debug: true
+app.use(morgan('combined'));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded());
+app.use(sassMiddleware({
+    src: path.join(__dirname, 'public'),
+    dest: path.join(__dirname, 'public'),
+    debug: true
 }));
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(serveStatic(path.join(__dirname, 'public')));
 
 // development only
 if ('development' == app.get('env')) {
-  app.use(express.errorHandler());
+  app.use(errorhandler());
 }
 
 app.get('/q', routes.q);
