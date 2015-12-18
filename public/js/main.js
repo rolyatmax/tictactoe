@@ -10,18 +10,20 @@ new Info({
     html: readme
 });
 
-$(function() {
-    $(document).on('click', '.local', startTraining.bind(null, 'local'))
-               .on('click', '.distributed', startTraining.bind(null, 'distributed'));
+$(() => {
+    $(document)
+        .on('click', '.local', startTraining.bind(null, 'local'))
+        .on('click', '.distributed', startTraining.bind(null, 'distributed'));
 
     function startTraining(method) {
         $(document).off('click');
         $('.training-choices').remove();
         $('#game').show();
-        var persist = method === 'distributed';
+        let persist = method === 'distributed';
         if (persist) {
-            $.getJSON('q').then(function(res) {
-                window.matrix = res.q['q_3_3'] || {}; // this will break if grid/streak vals change
+            $.getJSON('q').then((res) => {
+                // this will break if grid/streak vals change
+                window.matrix = res.q['q_3_3'] || {};
             }).then(startGame.bind(null, persist));
         } else {
             startGame(persist);

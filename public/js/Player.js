@@ -4,17 +4,16 @@ import Backbone from 'backbone';
 import Q from './Q';
 
 
-var defaults = {
+let defaults = {
     'symbol': null,
     'isComputer': false,
     'delay': 0
 };
 
-function Player(opts) {
-    opts = _.defaults(opts || {}, defaults);
-    _.extend(this, opts);
+function Player(opts = {}) {
+    Object.assign(this, defaults, opts);
 
-    var prefix = this.isSmart ? 'smart' : 'p';
+    let prefix = this.isSmart ? 'smart' : 'p';
     this.id = this.id || _.uniqueId(prefix);
     if (this.isSmart) {
         this.isComputer = true;
@@ -22,10 +21,11 @@ function Player(opts) {
     }
 }
 
-_.extend(Player.prototype, Backbone.Events, {
+Player.prototype = {
+    ...Backbone.Events,
 
-    start: function(opts) {
-        this.game = opts['game'];
+    start: function({game}) {
+        this.game = game;
         this.wins = 0;
         this.total = 0;
         this.bindEvents();
@@ -33,7 +33,7 @@ _.extend(Player.prototype, Backbone.Events, {
         this.createScorecard();
 
         if (this.isSmart) {
-            this.Q.start(this.game);
+            this.Q.start(game);
         }
     },
 
@@ -46,10 +46,10 @@ _.extend(Player.prototype, Backbone.Events, {
     bindEvents: function() {
         if (this._eventsBound) { return; }
 
-        this.listenTo(this, 'your_turn', this.onTurn);
-        this.listenTo(this, 'you_lose', this.onGameOver.bind(this, 'lose'));
-        this.listenTo(this, 'cat', this.onGameOver.bind(this, 'cat'));
-        this.listenTo(this, 'you_won', this.onGameOver.bind(this, 'win'));
+        this.listenTo(this, 'your_turn', this.play);
+        this.listenTo(this, 'you_lose', () => this.onGameOver('lose'));
+        this.listenTo(this, 'cat', () => this.onGameOver('cat'));
+        this.listenTo(this, 'you_won', () => this.onGameOver('win'));
         this.listenTo(this, 'toggle_computer', this.onToggleComputer);
 
         this._eventsBound = true;
@@ -60,7 +60,7 @@ _.extend(Player.prototype, Backbone.Events, {
     },
 
     setSymbol: function() {
-        var symbol = this.game.requestSymbol();
+        let symbol = this.game.requestSymbol();
         this.symbol = symbol;
         if (this.isSmart) {
             this.Q.setSymbol(symbol);
@@ -79,21 +79,15 @@ _.extend(Player.prototype, Backbone.Events, {
         }
     },
 
-    onTurn: function(board, options) {
-        var play = this.play.bind(this, board, options);
-        play();
-    },
-
     renderScore: function() {
-        this.$scorecard.html(this.id + ': <span>' + this.wins + '</span>');
+        this.$scorecard.html(`${this.id}: <span>${this.wins}</span>`);
     },
 
     play: function(board, options) {
         if (!this.isComputer) { return; }
-
-        var choice = this.isSmart ? this.Q.choose(board, options) : _.sample(options, 1)[0];
+        let choice = this.isSmart ? this.Q.choose(board, options) : _.sample(options, 1)[0];
         this.trigger('select_square', choice);
     }
-});
+};
 
 export default Player;
