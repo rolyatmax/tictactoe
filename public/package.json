@@ -1,0 +1,14 @@
+{
+  "name": "tictactoe-ui",
+  "version": "0.0.1",
+  "homepage": "https://github.com/rolyatmax/tictactoe",
+  "authors": [
+    "Taylor Baldwin <taylorbaldwin@gmail.com>"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "backbone": "^1.2.3",
+    "jquery": "^2.1.4",
+    "lodash": "^3.10.1"
+  }
+}
