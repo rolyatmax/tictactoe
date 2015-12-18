@@ -1,13 +1,13 @@
 import $ from 'jquery';
 import Player from './Player';
 import TicTacToe from './TicTacToe';
+import readme from '../README.md';
 
 
 new Info({
     keyTrigger: true,
     container: 'wrapper',
-    isMarkdown: true,
-    url: 'README.md'
+    html: readme
 });
 
 $(function() {
