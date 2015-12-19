@@ -1,3 +1,5 @@
+/* globals Info */
+
 import $ from 'jquery';
 import Player from './Player';
 import TicTacToe from './TicTacToe';

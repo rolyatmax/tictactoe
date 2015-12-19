@@ -65,7 +65,7 @@ _.extend(Q.prototype, Backbone.Events, {
         var qs = this.stack.slice();
         this.stack = [];
 
-        return $.ajax({
+        $.ajax({
             url: 'q',
             data: JSON.stringify({qs: qs}),
             contentType: 'application/json; charset=utf-8',
@@ -169,7 +169,8 @@ _.extend(Q.prototype, Backbone.Events, {
         var lastStateActionVal = lastState[this.lastAction];
         var state = board && this.getState(board);
         var curBestChoice = state ? _.max(state) || 0 : 0;
-        var points = (1 - this.discount) * lastStateActionVal + this.alpha * (reward + this.discount * curBestChoice);
+        var points = (1 - this.discount) * lastStateActionVal +
+                     this.alpha * (reward + this.discount * curBestChoice);
         points = ((points * 1000) | 0) / 1000;
         lastState[this.lastAction] = points;
 
