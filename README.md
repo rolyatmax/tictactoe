@@ -35,7 +35,6 @@ is, for our purposes, the same as
     -----------            -----------
      X |   |                  |   | X
 
-
 Making sure these board states were considered equivalent cut down on the amount of memory required to store the policy and, consequently, the amount of time required to generate an effective policy.
 
 To accomplish the normalization, the choosing function turns the board state into a string. The string representation of this board (from the *X*'s point of view):
@@ -56,10 +55,10 @@ See it in action at [tbaldw.in/tictactoe](https://tbaldw.in/tictactoe). Check ou
 To run on your own:
 ------------------
 
-`npm install`
+    npm install
 
-`cd public && bower install`
+    cd public && npm install && npm run build
 
-`cd .. && node app`
+    cd .. && npm run start
 
 Point your browser to `localhost:8080`

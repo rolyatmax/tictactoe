@@ -1,15 +1,15 @@
 <!doctype html>
 <html>
 <head>
-	<title>Tic Tac Toe</title>
+    <title>Tic Tac Toe</title>
 
-	<link href='https://fonts.googleapis.com/css?family=Raleway:900,400,600' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Raleway:900,400,600' rel='stylesheet' type='text/css'>
     <link rel="stylesheet" href="style/info.css">
-	<link rel="stylesheet" href="style/style.css">
+    <link rel="stylesheet" href="style/style.css">
 </head>
 <body>
     <div id="wrapper">
-    	<div id="container">
+        <div id="container">
             <div class="title">
                 <h1>Tic-Tac-Toe</h1>
                 <h3>Reinforcement Learning</h3>
@@ -35,67 +35,21 @@
                     <div class="for-playing">Click the board to play against the algorithm</div>
                 </div>
             </div>
-    	</div>
+        </div>
     </div>
 
     <script src="js/info.js"></script>
-	<script src="bower_components/jquery/dist/jquery.min.js"></script>
-	<script src="bower_components/lodash/lodash.min.js"></script>
-	<script src="bower_components/backbone/backbone.js"></script>
-    <script src="js/Markdown.Converter.js"></script>
+    <script src="build/build.js"></script>
+    <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-36884625-1']);
+      _gaq.push(['_trackPageview']);
 
-    <script src="js/Q.js"></script>
-    <script src="js/Player.js"></script>
-	<script src="js/Square.js"></script>
-	<script src="js/TicTacToe.js"></script>
-    <script>
-        new Info({
-            keyTrigger: true,
-            container: 'wrapper',
-            isMarkdown: true,
-            url: 'README.md'
-        });
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
     </script>
-	<script>
-		$(function() {
-            $(document).on('click', '.local', startTraining.bind(null, 'local'))
-                       .on('click', '.distributed', startTraining.bind(null, 'distributed'));
-
-            function startTraining(method) {
-                $(document).off('click');
-                $('.training-choices').remove();
-                $('#game').show();
-                var persist = method === 'distributed';
-                if (persist) {
-                    $.getJSON('q').then(function(res) {
-                        window.matrix = res.q['q_3_3'] || {}; // this will break if grid/streak vals change
-                    }).then(startGame.bind(null, persist));
-                } else {
-                    startGame(persist);
-                }
-            }
-
-            function startGame(persist) {
-                window.game = new TicTacToe({
-                    'grid': 3,
-                    'streak': 3,
-                    'players': [
-                        new Player({
-                            'persist': persist,
-                            'isSmart': true,
-                            'id': 'Smart'
-                        }),
-                        new Player({
-                            'id': 'Kinda Smart',
-                            'persist': persist,
-                            'isComputer': true,
-                            'isSmart': true,
-                            'discover': 0.5
-                        })
-                    ]
-                });
-            }
-		});
-	</script>
 </body>
 </html>

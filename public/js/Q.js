@@ -1,296 +1,291 @@
-var Q = (function() {
-    'use strict';
+import {sortBy, min, max, random, pick, flatten, cloneDeep} from 'lodash';
+import Backbone from 'backbone';
+import $ from 'jquery';
 
-    var DELIMITER = '|';
-    var LOCAL_STORAGE_KEY = 'q';
 
-    var defaults = {
-        'persist': false,
-        'saveInterval': 5000,
-        'discover': 0.0,
-        'alpha': 1.0,
-        'decay': 0.99996,
-        'discount': 0.2,
-        'rewards': {
-            'alive': 1,
-            'win': 10,
-            'lose': -1000,
-            'cat': 1
+const DELIMITER = '|';
+const LOCAL_STORAGE_KEY = 'q';
+
+let defaults = {
+    persist: false,
+    saveInterval: 5000,
+    discover: 0.0,
+    alpha: 1.0,
+    decay: 0.99996,
+    discount: 0.2,
+    rewards: {
+        alive: 1,
+        win: 10,
+        lose: -1000,
+        cat: 1
+    }
+};
+
+function Q(opts = {}) {
+    Object.assign(this, defaults, opts);
+
+    // all Qs should contribute to the same matrix
+    window.matrix = window.matrix || {};
+    this.matrix = window.matrix;
+
+    this.timer = 0;
+    this.stack = [];
+    this.started = false;
+    this.bindEvents();
+}
+
+Q.prototype = {
+    ...Backbone.Events,
+
+    start(game) {
+        this.game = game;
+        this.name = _localStorageKey(this.game.grid, this.game.streak);
+        if (this.persist) {
+            this.alpha = 0.3;
+            this.decay = 1;
+            this.startPersist();
         }
-    };
+        this.started = true;
+    },
 
-    function Q(opts) {
-        opts = _.defaults(opts || {}, defaults);
-        _.extend(this, opts);
+    push(data) {
+        this.stack.push(data);
+        // console.log('Reward:', data);
+    },
 
-        // all Qs should contribute to the same matrix
-        window.matrix = window.matrix || {};
-        this.matrix = window.matrix;
+    sendLoop() {
+        this.timer = setTimeout(() => this.sendLoop(), this.saveInterval);
+        this.sendData();
+    },
 
-        this.timer = 0;
+    sendData() {
+        if (!this.persist || (this.started && !this.stack.length)) {
+            return;
+        }
+
+        let qs = this.stack.slice();
         this.stack = [];
-        this.started = false;
-        this.bindEvents();
-    }
 
-    _.extend(Q.prototype, Backbone.Events, {
-        start: function(game) {
-            this.game = game;
-            this.name = _localStorageKey(this.game.grid, this.game.streak);
-            if (this.persist) {
-                this.alpha = 0.3;
-                this.decay = 1;
-                this.startPersist();
-            }
-            this.started = true;
-        },
+        $.ajax({
+            url: 'q',
+            data: JSON.stringify({ qs }),
+            contentType: 'application/json; charset=utf-8',
+            dataType: 'json',
+            type: 'POST'
+        }).then(this.onQReceived.bind(this));
+    },
 
-        push: function(data) {
-            this.stack.push(data);
-            // console.log('Reward:', data);
-        },
+    onQReceived(res) {
+        this.matrix = res.q[this.name] || {};
+        console.log('Q received!', res);
+    },
 
-        sendLoop: function() {
-            this.timer = setTimeout(this.sendLoop.bind(this), 10000);
-            this.sendData();
-        },
+    bindEvents() {
+        if (this._eventsBound) { return; }
+        this.listenTo(this, 'reward_activity', this.evaluateLast);
+        this._eventsBound = true;
+    },
 
-        sendData: function() {
-            if (!this.persist || (this.started && !this.stack.length)) {
-                return;
-            }
+    startPersist() {
+        $.getJSON('q', this.onQReceived.bind(this)).then(() => {
+            this.persist = true;
+            this.sendLoop();
+        });
+    },
 
-            var qs = this.stack.slice();
-            this.stack = [];
+    setSymbol(symbol) {
+        this.symbol = symbol;
+    },
 
-            return $.ajax({
-                url: 'q',
-                data: JSON.stringify({qs: qs}),
-                contentType: 'application/json; charset=utf-8',
-                dataType: 'json',
-                type: 'POST'
-            }).then(this.onQReceived.bind(this));
-        },
+    getState(board) {
+        this.mutations = _permutationSearch(board, this.matrix, this.symbol);
+        let hash = this.mutations ? this.mutations['hash'] : _hashBoard(board, this.symbol);
+        this.matrix[hash] = this.matrix[hash] || {};
+        return this.matrix[hash];
+    },
 
-        onQReceived: function(res) {
-            this.matrix = res.q[this.name] || {};
-            console.log('Q received!', res);
-        },
-
-        bindEvents: function() {
-            if (this._eventsBound) return;
-            this.listenTo(this, 'reward_activity', this.evaluateLast);
-            this._eventsBound = true;
-        },
-
-        startPersist: function() {
-            $.getJSON('q', this.onQReceived.bind(this)).then(function() {
-                this.persist = true;
-                this.sendLoop();
-            }.bind(this));
-        },
-
-        setSymbol: function(symbol) {
-            this.symbol = symbol;
-        },
-
-        getState: function(board) {
-            this.mutations = _permutationSearch(board, this.matrix, this.symbol);
-            var hash = this.mutations ? this.mutations['hash'] : _hashBoard(board, this.symbol);
-            this.matrix[hash] = this.matrix[hash] || {};
-            return this.matrix[hash];
-        },
-
-        showChoices: function(choices) {
-            var $choices = $('.choices');
-            $choices.empty();
-            choices = _.sortBy(choices, function(choice) {
-                return -choice.points;
+    showChoices(choices) {
+        let $choices = $('.choices');
+        $choices.empty();
+        choices = sortBy(choices, (choice) => -choice.points);
+        choices.forEach((choice) => {
+            let html = `<span>${choice.coords}:</span>${choice.points}`;
+            let $choice = $('<span>').attr({
+                'data-uid': choice.coords,
+                'class': 'choice'
             });
-            _.each(choices, function(choice) {
-                var html = '<span>' + choice.coords + ':</span>' + choice.points;
 
-                var $choice = $('<span>').attr({
-                    'data-uid': choice.coords,
-                    'class': 'choice'
-                });
+            $choice.html(html);
+            $choices.append($choice);
+        });
+    },
 
-                $choice.html(html);
-                $choices.append($choice);
-            });
-        },
-
-        choose: function(board, options) {
-            var state = this.getState(board);
-
-            options = _transformOpts(options);
-            _.each(options, function(option) {
-                var mutated = _mutate(option, this.mutations);
-                option['x'] = mutated['x'];
-                option['y'] = mutated['y'];
-                var actionHash = _hashSquareObj(option);
-                option['hash'] = actionHash;
-                option['points'] = state[actionHash] || (state[actionHash] = 0);
-            }.bind(this));
-
-            var min = _.min(options, function(option) { return option['points']; });
-            var max = _.max(options, function(option) { return option['points']; });
-
-            var chooseRandom = (min['points'] === max['points'] || Math.random() < this.discover);
-            var action = chooseRandom ? options[_.random(0, options.length - 1)] : max;
-
-            this.trigger('reward_activity', 'alive', board);
-
-            var hash = this.mutations ? this.mutations['hash'] : _hashBoard(board, this.symbol);
-            this.lastBoard = hash;
-            this.lastAction = action['hash'];
-            var choice = _mutate(action, this.mutations, true);
-            var choices = _.map(options, function(option) {
-                option = _mutate(option, this.mutations, true);
-                return {
-                    'coords': _hashSquareObj(option),
-                    'points': option['points']
-                };
-            }.bind(this));
-            this.showChoices(choices);
-            return _hashSquareObj(choice);
-        },
-
-        evaluateLast: function(result, board) {
-            if (!this.lastBoard || !this.lastAction) return;
-
-            var reward = this.rewards[result];
-            var lastState = this.matrix[this.lastBoard];
-            if (!lastState) {
-                return;
-            }
-            var lastStateActionVal = lastState[this.lastAction];
-            var state = board && this.getState(board);
-            var curBestChoice = state ? _.max(state) || 0 : 0;
-            var points = (1 - this.discount) * lastStateActionVal + this.alpha * (reward + this.discount * curBestChoice);
-            points = ((points * 1000) | 0) / 1000;
-            lastState[this.lastAction] = points;
-
-            if (this.persist) {
-                this.push({
-                    'name': this.name,
-                    'stateHash': this.lastBoard,
-                    'actionHash': this.lastAction,
-                    'val': points,
-                    'reward': reward
-                });
-            }
-
-            if (result !== 'alive') {
-                this.lastBoard = this.lastAction = 0;
-                $('.choices').empty();
-            }
-
-            this.alpha *= this.decay;
-            // console.log(this.alpha);
-            if (this.alpha < 0.000001) alert('Done training!');
-        }
-    });
-
-    /////////// helpers
-    function _localStorageKey(grid, streak) {
-        return LOCAL_STORAGE_KEY + '_' + grid + '_' + streak;
-    }
-
-    function _hashBoard(board, mySymbol) {
-        // creating hashes of the board, to store as keys for the state info for Q
-        // 0 = null, a = me, b = opponent
-        return _.map(_.flatten(board), function(symbol) {
-            if (!symbol) return 0;
-            if (symbol === mySymbol) return 'a';
-            return 'b';
-        }).join('');
-    }
-
-    function _transformOpts(options) {
-        return _.map(options, function(option) {
-            var coords = option.split(DELIMITER);
+    choose(board, options) {
+        let state = this.getState(board);
+        options = _transformOpts(options).map((option) => {
+            let { x, y } = _mutate(option, this.mutations);
+            option = { ...option, x, y };
+            let actionHash = _hashSquareObj(option);
             return {
-                x: coords[0],
-                y: coords[1]
+                ...option,
+                hash: actionHash,
+                points: state[actionHash] || (state[actionHash] = 0)
             };
         });
-    }
 
-    function _hashSquareObj(obj) {
-        return obj.x + DELIMITER + obj.y;
-    }
+        let minOpt = min(options, ({points}) => points);
+        let maxOpt = max(options, ({points}) => points);
 
-    function _permutationSearch(board, matrix, mySymbol) {
-        var mutations = {
-            turns: 0,
-            flips: 0,
-            hash: null,
-            boardSize: board.length
-        };
-        var flips = 1;
-        while (flips--) {
-            mutations['flips'] = flips;
-            board = _flip(board, flips);
-            var turns = 3;
-            while (turns--) {
-                mutations['turns'] = turns;
-                var hash = _hashBoard(_rotate(board, turns), mySymbol);
-                mutations['hash'] = hash;
-                if (hash in matrix) return mutations;
-            }
+        let chooseRandom = (minOpt.points === maxOpt.points || Math.random() < this.discover);
+        let action = chooseRandom ? options[random(0, options.length - 1)] : maxOpt;
+
+        this.trigger('reward_activity', 'alive', board);
+
+        let hash = this.mutations ? this.mutations['hash'] : _hashBoard(board, this.symbol);
+        this.lastBoard = hash;
+        this.lastAction = action['hash'];
+        let choice = _mutate(action, this.mutations, true);
+        let choices = options.map((option) => {
+            option = _mutate(option, this.mutations, true);
+            return {
+                coords: _hashSquareObj(option),
+                points: option['points']
+            };
+        });
+        this.showChoices(choices);
+        return _hashSquareObj(choice);
+    },
+
+    evaluateLast(result, board) {
+        if (!this.lastBoard || !this.lastAction) { return; }
+
+        let reward = this.rewards[result];
+        let lastState = this.matrix[this.lastBoard];
+        if (!lastState) {
+            return;
         }
-        return false;
-    }
+        let lastStateActionVal = lastState[this.lastAction];
+        let state = board && this.getState(board);
+        let curBestChoice = state ? max(state) || 0 : 0;
+        let points = (1 - this.discount) * lastStateActionVal +
+                     this.alpha * (reward + this.discount * curBestChoice);
+        points = ((points * 1000) | 0) / 1000;
+        lastState[this.lastAction] = points;
 
-    function _rotate(board, turns) {
-        turns = turns || 1;
-        board = _.cloneDeep(board);
-        var newBoard;
-        var lastX = board[0].length - 1;
+        if (this.persist) {
+            this.push({
+                'name': this.name,
+                'stateHash': this.lastBoard,
+                'actionHash': this.lastAction,
+                'val': points,
+                'reward': reward
+            });
+        }
+
+        if (result !== 'alive') {
+            this.lastBoard = this.lastAction = 0;
+            $('.choices').empty();
+        }
+
+        this.alpha *= this.decay;
+        if (this.alpha < 0.000001) { alert('Done training!'); }
+    }
+};
+
+/////////// helpers
+function _localStorageKey(grid, streak) {
+    return `${LOCAL_STORAGE_KEY}_${grid}_${streak}`;
+}
+
+function _hashBoard(board, mySymbol) {
+    // creating hashes of the board, to store as keys for the state info for Q
+    // 0 = null, a = me, b = opponent
+    return flatten(board).map((symbol) => {
+        if (!symbol) { return 0; }
+        if (symbol === mySymbol) { return 'a'; }
+        return 'b';
+    }).join('');
+}
+
+function _transformOpts(options) {
+    return options
+        .map((option) => option.split(DELIMITER))
+        .map(([x, y]) => ({ x, y }));
+}
+
+function _hashSquareObj({x, y}) {
+    return `${x}${DELIMITER}${y}`;
+}
+
+function _permutationSearch(board, matrix, mySymbol) {
+    let mutations = {
+        turns: 0,
+        flips: 0,
+        hash: null,
+        boardSize: board.length
+    };
+    let flips = 1;
+    while (flips--) {
+        mutations['flips'] = flips;
+        board = _flip(board, flips);
+        let turns = 3;
         while (turns--) {
-            newBoard = [];
-            var y = board.length;
-            while (y--) {
-                var x = board[y].length;
-                while (x--) {
-                    newBoard[x] = newBoard[x] || [];
-                    newBoard[x][lastX - y] = board[y][x];
-                }
-            }
-            board = newBoard;
+            mutations['turns'] = turns;
+            let hash = _hashBoard(_rotate(board, turns), mySymbol);
+            mutations['hash'] = hash;
+            if (hash in matrix) { return mutations; }
         }
-        return board;
     }
+    return false;
+}
 
-    function _flip(board, flips) {
-        if (flips === 0) return board;
-        board = _.cloneDeep(board);
-        var y = board.length;
+function _rotate(board, turns) {
+    turns = turns || 1;
+    board = cloneDeep(board);
+    let newBoard;
+    let lastX = board[0].length - 1;
+    while (turns--) {
+        newBoard = [];
+        let y = board.length;
         while (y--) {
-            board[y] = board[y].reverse();
+            let x = board[y].length;
+            while (x--) {
+                newBoard[x] = newBoard[x] || [];
+                newBoard[x][lastX - y] = board[y][x];
+            }
         }
-        return board;
+        board = newBoard;
+    }
+    return board;
+}
+
+function _flip(board, flips) {
+    if (flips === 0) { return board; }
+    board = cloneDeep(board);
+    let y = board.length;
+    while (y--) {
+        board[y] = board[y].reverse();
+    }
+    return board;
+}
+
+function _mutate(action, mutations, reverse) {
+    action = { ...action };
+    let newAction = pick(action, 'x', 'y', 'points');
+    let lastX = mutations['boardSize'] - 1;
+    let turns = reverse ? 4 - mutations['turns'] : mutations['turns'];
+    let flips = mutations['flips'];
+
+    while (turns--) {
+        newAction['x'] = lastX - action['y'];
+        newAction['y'] = action['x'];
+        action = {...action, ...newAction};
     }
 
-    function _mutate(action, mutations, reverse) {
-        action = _.clone(action);
-        var newAction = _.pick(action, 'x', 'y', 'points');
-        var lastX = mutations['boardSize'] - 1;
-        var turns = reverse ? 4 - mutations['turns'] : mutations['turns'];
-        var flips = mutations['flips'];
-
-        while (turns--) {
-            newAction['x'] = lastX - action['y'];
-            newAction['y'] = action['x'];
-            action = _.extend(action, newAction);
-        }
-
-        if (flips) {
-            newAction['x'] = Math.abs(action['x'] - lastX);
-        }
-        return newAction;
+    if (flips) {
+        newAction['x'] = Math.abs(action['x'] - lastX);
     }
+    return newAction;
+}
 
-    return Q;
-})();
+export default Q;
