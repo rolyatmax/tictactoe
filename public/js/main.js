@@ -1,5 +1,6 @@
 /* globals Info */
 
+import 'babel-polyfill';
 import $ from 'jquery';
 import Player from './Player';
 import TicTacToe from './TicTacToe';
@@ -34,20 +35,20 @@ $(() => {
 
     function startGame(persist) {
         window.game = new TicTacToe({
-            'grid': 3,
-            'streak': 3,
-            'players': [
+            grid: 3,
+            streak: 3,
+            players: [
                 new Player({
-                    'persist': persist,
-                    'isSmart': true,
-                    'id': 'Smart'
+                    persist: persist,
+                    isSmart: true,
+                    id: 'Smart'
                 }),
                 new Player({
-                    'id': 'Kinda Smart',
-                    'persist': persist,
-                    'isComputer': true,
-                    'isSmart': true,
-                    'discover': 0.5
+                    id: 'Kinda Smart',
+                    persist: persist,
+                    isComputer: true,
+                    isSmart: true,
+                    discover: 0.5
                 })
             ]
         });

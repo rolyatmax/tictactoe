@@ -1,7 +1,4 @@
-import {
-    defer, sample, pluck, isArray, all, indexOf, contains, values, every,
-    flatten, findWhere, random
-} from 'lodash';
+import {sample, flatten, random} from 'lodash';
 import $ from 'jquery';
 import Backbone from 'backbone';
 import Player from './Player';
@@ -13,11 +10,11 @@ let symbols = 'xo'.split('');
 
 function getDefaults() {
     return {
-        'el': '#game',
-        'grid': 3,
-        'streak': 3,
-        'gravity': false,
-        'players': []
+        el: '#game',
+        grid: 3,
+        streak: 3,
+        gravity: false,
+        players: []
     };
 }
 
@@ -31,24 +28,24 @@ function TicTacToe(opts = {}) {
 TicTacToe.prototype = {
     ...Backbone.Events,
 
-    setup: function() {
+    setup() {
         this.setupBoard();
         this.setupPlayers();
         this.start();
     },
 
-    reset: function() {
+    reset() {
         if (this.playing) { return; }
-        values(this.squares).forEach((square) => square.setValue(null));
+        Object.keys(this.squares).forEach((key) => this.squares[key].setValue(null));
         this.board = _createBoard(this.grid);
         this.currentPlayer = sample(this.players, 1)[0];
         this.playing = true;
         this.totalGames += 1;
         this.$('.total span').text(this.totalGames);
-        defer(() => this.nextTurn());
+        setTimeout(() => this.nextTurn(), 0);
     },
 
-    setupBoard: function() {
+    setupBoard() {
         if (!this.$el) {
             throw new Error('Cannot setup board! No DOM Element for game found');
         }
@@ -56,7 +53,7 @@ TicTacToe.prototype = {
         this.board = _createBoard(this.grid);
         this.squares = _createSquares(this.board);
 
-        let els = pluck(this.squares, '$el');
+        let els = Object.keys(this.squares).map(key => this.squares[key].$el);
         let $squares = this.$('.squares').append(els);
 
         // styling
@@ -70,8 +67,8 @@ TicTacToe.prototype = {
         });
     },
 
-    setupPlayers: function() {
-        if (!isArray(this.players)) {
+    setupPlayers() {
+        if (!Array.isArray(this.players)) {
             throw new Error('players attribute must be an array of Players');
         }
 
@@ -82,16 +79,16 @@ TicTacToe.prototype = {
         this.currentPlayer = sample(this.players, 1)[0];
     },
 
-    start: function() {
+    start() {
         this.playing = true;
         this.bindEvents();
         this.players.forEach((player) => player.start({'game': this}));
-        this.training = all(this.players, (player) => player.isComputer);
+        this.training = this.players.every((player) => player.isComputer);
         this.toggleMessages();
         this.nextTurn();
     },
 
-    bindEvents: function() {
+    bindEvents() {
         if (this._eventsBound) { return; }
 
         $(document).on('keypress', this.onKeyPress.bind(this));
@@ -110,7 +107,7 @@ TicTacToe.prototype = {
         this._eventsBound = true;
     },
 
-    nextTurn: function() {
+    nextTurn() {
         if (!this.playing) { return; }
         let winner = this.checkForWin();
         if (winner) {
@@ -130,7 +127,7 @@ TicTacToe.prototype = {
             return;
         }
 
-        let curIdx = indexOf(this.players, this.currentPlayer);
+        let curIdx = this.players.indexOf(this.currentPlayer);
         let nextIdx = (curIdx + 1) % this.players.length;
         this.currentPlayer = this.players[nextIdx];
         let options = _getOptions(this.board, this.gravity);
@@ -138,49 +135,51 @@ TicTacToe.prototype = {
         this.currentPlayer.trigger('your_turn', this.board, options);
     },
 
-    onMouseoverChoice: function(e) {
+    onMouseoverChoice(e) {
         let uid = $(e.currentTarget).data('uid');
         $('.square[data-uid="' + uid + '"]').addClass('highlight');
     },
 
-    onMouseoutChoice: function(e) {
+    onMouseoutChoice(e) {
         let uid = $(e.currentTarget).data('uid');
         $('.square[data-uid="' + uid + '"]').removeClass('highlight');
     },
 
-    onClickSquare: function(e) {
+    onClickSquare(e) {
         if (this.currentPlayer.isComputer) { return; }
         let uid = $(e.currentTarget).data('uid');
         this.selectSquare(this.currentPlayer, uid);
     },
 
-    onKeyPress: function(e) {
+    onKeyPress(e) {
         if (e.which === 32) { // spacebar
             this.toggleComputer();
         }
     },
 
-    onInsertScoreCard: function($el) {
+    onInsertScoreCard($el) {
         this.$('.scores').append($el);
     },
 
-    selectSquare: function(player, choice) {
+    selectSquare(player, choice) {
         if (player !== this.currentPlayer) { return; } // throw 'Not current player';
         let square = this.squares[choice];
         if (square.value) { throw new Error('Square already taken'); }
         let options = _getOptions(this.board, this.gravity);
-        if (!contains(options, square.uid)) { throw new Error('Not an option'); }
+        if (!options.includes(square.uid)) { throw new Error('Not an option'); }
         square.setValue(this.currentPlayer.symbol);
         this.updateBoard();
         this.nextTurn();
     },
 
-    updateBoard: function() {
-        values(this.squares).forEach(({x, y, value}) => this.board[y][x] = value);
+    updateBoard() {
+        Object.keys(this.squares)
+            .map(key => this.squares[key])
+            .forEach(({x, y, value}) => this.board[y][x] = value);
     },
 
-    checkForWin: function() {
-        let squares = values(this.squares);
+    checkForWin() {
+        let squares = Object.keys(this.squares).map(key => this.squares[key]);
         let i = squares.length;
 
         while (i--) {
@@ -192,35 +191,35 @@ TicTacToe.prototype = {
         return false;
     },
 
-    checkForCat: function() {
-        return every(flatten(this.board));
+    checkForCat() {
+        return flatten(this.board).every(cell => cell);
     },
 
-    requestSymbol: function() {
+    requestSymbol() {
         return _getSymbol();
     },
 
-    getPlayerBySymbol: function(symbol) {
-        return findWhere(this.players, {symbol});
+    getPlayerBySymbol(symbol) {
+        return this.players.filter((player) => player.symbol === symbol)[0];
     },
 
-    toggleMessages: function() {
+    toggleMessages() {
         $('.for-playing').toggleClass('show', !this.training);
         $('.for-training').toggleClass('show', this.training);
     },
 
-    toggleComputer: function() {
+    toggleComputer() {
         this.training = !this.training;
         this.toggleMessages();
         let playerTwo = this.players[1];
         playerTwo.trigger('toggle_computer');
         if (playerTwo.isComputer) {
             let options = _getOptions(this.board, this.gravity);
-            playerTwo.onTurn(this.board, options);
+            playerTwo.trigger('your_turn', this.board, options);
         }
     },
 
-    $: function(selector) {
+    $(selector) {
         return this.$el.find(selector);
     }
 };
@@ -242,19 +241,17 @@ function _createBoard(grid) {
 
 function _createSquares(board) {
     let squares = {};
-    let y = board.length;
-    for (let i = 0; i < y; i++) {
-        let x = board[i].length;
-        for (let j = 0; j < x; j++) {
-            let uid = j + DELIMITER + i;
-            let val = board[i][j];
-            let opts = {
-                '$el': $('<div>').addClass('square').attr('data-uid', uid),
-                'x': j,
-                'y': i,
-                'uid': uid
-            };
-            if (val) { opts['value'] = val; }
+    let i = board.length;
+    for (let y = 0; y < i; y++) {
+        let j = board[y].length;
+        for (let x = 0; x < j; x++) {
+            let uid = x + DELIMITER + y;
+            let val = board[y][x];
+            let $el = $('<div>').addClass('square').attr('data-uid', uid);
+            let opts = {$el, x, y, uid};
+            if (val) {
+                opts = {...opts, value: val};
+            }
             squares[uid] = new Square(opts);
         }
     }
@@ -263,7 +260,12 @@ function _createSquares(board) {
 
 function _getSymbol() {
     let i = random(0, symbols.length - 1);
-    return symbols.splice(i, 1)[0];
+    let symbol = symbols[i];
+    symbols = [
+        ...symbols.slice(0, i),
+        ...symbols.slice(i + 1)
+    ];
+    return symbol;
 }
 
 function _checkForWin(board, streak, x, y) {

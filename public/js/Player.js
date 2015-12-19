@@ -1,20 +1,19 @@
-import _ from 'lodash';
+import {uniqueId, sample} from 'lodash';
 import $ from 'jquery';
 import Backbone from 'backbone';
 import Q from './Q';
 
 
-let defaults = {
-    'symbol': null,
-    'isComputer': false,
-    'delay': 0
+const defaults = {
+    symbol: null,
+    isComputer: false,
+    delay: 0
 };
 
 function Player(opts = {}) {
     Object.assign(this, defaults, opts);
-
     let prefix = this.isSmart ? 'smart' : 'p';
-    this.id = this.id || _.uniqueId(prefix);
+    this.id = this.id || uniqueId(prefix);
     if (this.isSmart) {
         this.isComputer = true;
         this.Q = new Q(opts);
@@ -24,7 +23,7 @@ function Player(opts = {}) {
 Player.prototype = {
     ...Backbone.Events,
 
-    start: function({game}) {
+    start({game}) {
         this.game = game;
         this.wins = 0;
         this.total = 0;
@@ -37,13 +36,13 @@ Player.prototype = {
         }
     },
 
-    createScorecard: function() {
+    createScorecard() {
         this.$scorecard = $('<div>').addClass('score-card');
         this.trigger('insert_scorecard', this.$scorecard);
         this.renderScore();
     },
 
-    bindEvents: function() {
+    bindEvents() {
         if (this._eventsBound) { return; }
 
         this.listenTo(this, 'your_turn', this.play);
@@ -55,11 +54,11 @@ Player.prototype = {
         this._eventsBound = true;
     },
 
-    onToggleComputer: function() {
+    onToggleComputer() {
         this.isComputer = !this.isComputer;
     },
 
-    setSymbol: function() {
+    setSymbol() {
         let symbol = this.game.requestSymbol();
         this.symbol = symbol;
         if (this.isSmart) {
@@ -67,7 +66,7 @@ Player.prototype = {
         }
     },
 
-    onGameOver: function(reward) {
+    onGameOver(reward) {
         if (this.isSmart) {
             this.Q.trigger('reward_activity', reward);
         }
@@ -79,13 +78,13 @@ Player.prototype = {
         }
     },
 
-    renderScore: function() {
+    renderScore() {
         this.$scorecard.html(`${this.id}: <span>${this.wins}</span>`);
     },
 
-    play: function(board, options) {
+    play(board, options) {
         if (!this.isComputer) { return; }
-        let choice = this.isSmart ? this.Q.choose(board, options) : _.sample(options, 1)[0];
+        let choice = this.isSmart ? this.Q.choose(board, options) : sample(options, 1)[0];
         this.trigger('select_square', choice);
     }
 };
