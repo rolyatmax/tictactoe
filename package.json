@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "body-parser": "1.14.1",
-    "bower": "1.4.1",
+    "bower": "1.8.8",
     "errorhandler": "1.4.2",
     "express": "4.13.3",
     "forever": "0.15.1",
