@@ -16,7 +16,7 @@
   "dependencies": {
     "babel-polyfill": "^6.3.14",
     "backbone": "^1.2.3",
-    "jquery": "^2.1.4",
+    "jquery": "^3.5.1",
     "lodash": "^3.10.1"
   },
   "devDependencies": {
