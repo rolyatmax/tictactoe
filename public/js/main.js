@@ -44,7 +44,7 @@ $(() => {
                     id: 'Smart'
                 }),
                 new Player({
-                    id: 'Kinda Smart',
+                    id: 'Semi-random',
                     persist: persist,
                     isComputer: true,
                     isSmart: true,

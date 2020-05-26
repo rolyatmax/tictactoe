@@ -31,6 +31,7 @@ TicTacToe.prototype = {
     setup() {
         this.setupBoard();
         this.setupPlayers();
+        this.bindEvents();
         this.start();
     },
 
@@ -81,11 +82,11 @@ TicTacToe.prototype = {
 
     start() {
         this.playing = true;
-        this.bindEvents();
         this.players.forEach((player) => player.start({'game': this}));
         this.training = this.players.every((player) => player.isComputer);
         this.toggleMessages();
         this.nextTurn();
+        this.toggleComputer();
     },
 
     bindEvents() {
