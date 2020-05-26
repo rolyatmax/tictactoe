@@ -19,7 +19,7 @@
     "errorhandler": "1.4.2",
     "express": "4.13.3",
     "forever": "0.15.1",
-    "lodash": "3.9.3",
+    "lodash": "4.17.15",
     "morgan": "1.6.1",
     "serve-static": "1.10.0",
     "touch": "0.0.3",
