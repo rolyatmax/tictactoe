@@ -15,7 +15,7 @@
   "author": "Taylor Baldwin <taylorbaldwin@gmail.com> (https://tbaldw.in)",
   "dependencies": {
     "backbone": "^1.2.3",
-    "jquery": "^2.1.4",
+    "jquery": "^3.5.0",
     "lodash": "^3.10.1"
   },
   "devDependencies": {
