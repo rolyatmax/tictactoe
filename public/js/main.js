@@ -1,16 +1,15 @@
 /* globals Info */
 
-import 'babel-polyfill';
 import $ from 'jquery';
 import Player from './Player';
 import TicTacToe from './TicTacToe';
-import readme from '../README.md';
+import { infoHtml } from './infoHtml.js';
 
 
 new Info({
     keyTrigger: true,
     container: 'wrapper',
-    html: readme
+    html: infoHtml
 });
 
 $(() => {

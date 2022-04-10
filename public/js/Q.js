@@ -3,12 +3,13 @@ import Backbone from 'backbone';
 import $ from 'jquery';
 
 
+const MAX_EVENTS = 1000;
 const DELIMITER = '|';
 const LOCAL_STORAGE_KEY = 'q';
 
 let defaults = {
     persist: false,
-    saveInterval: 5000,
+    saveInterval: 2500,
     discover: 0.0,
     alpha: 1.0,
     decay: 0.99996,
@@ -63,7 +64,7 @@ Q.prototype = {
             return;
         }
 
-        let qs = this.stack.slice();
+        let qs = this.stack.slice(0, MAX_EVENTS);
         this.stack = [];
 
         $.ajax({
