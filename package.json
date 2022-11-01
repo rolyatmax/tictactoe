@@ -15,10 +15,10 @@
   },
   "dependencies": {
     "body-parser": "1.14.1",
-    "bower": "1.4.1",
+    "bower": "1.8.14",
     "errorhandler": "1.4.2",
     "express": "4.13.3",
-    "forever": "0.15.1",
+    "forever": "0.15.3",
     "lodash": "3.9.3",
     "morgan": "1.6.1",
     "serve-static": "1.10.0",
