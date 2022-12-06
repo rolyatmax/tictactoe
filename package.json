@@ -17,7 +17,7 @@
     "body-parser": "1.14.1",
     "bower": "1.4.1",
     "errorhandler": "1.4.2",
-    "express": "4.13.3",
+    "express": "4.17.3",
     "forever": "0.15.1",
     "lodash": "3.9.3",
     "morgan": "1.6.1",
